@@ -1,7 +1,7 @@
 //ui
 
 //hooks
-export {useBusinesses} from './hooks/useBusinesses'
+export {useProfile} from './hooks/useProfile'
 
 //types
 export * from './types/model'

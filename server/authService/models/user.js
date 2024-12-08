@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
 const userSchema = new Schema(
     {
@@ -33,13 +33,13 @@ const userSchema = new Schema(
             default: "client",
             required: true,
         },
-        businessId: {
+        businessId: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: "Business",
             required: false,
-        },
+        }],
     },
     { timestamps: true }
-);
+)
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema)

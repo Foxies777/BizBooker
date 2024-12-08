@@ -1,9 +1,9 @@
-import { createEffect, restore } from "effector";
-import { getAllCategories, getBusinesses } from "../../../shared/api/business";
+import { sample } from "effector"
+import { addCategoryFx } from "../../../shared/business"
 
 
-export const getBusinessesFx = createEffect(getBusinesses)
-export const $businesses = restore(getBusinessesFx, [])
-
-export const getCateroryFx = createEffect(getAllCategories)
-export const $allCategories = restore(getCateroryFx, [])
+sample({
+    clock: addCategoryFx,
+    fn: (category) => category,
+    target: addCategoryFx,
+})

@@ -1,8 +1,8 @@
-import { notification } from "antd";
-import { createEffect } from "effector";
+import { notification } from "antd"
+import { createEffect } from "effector"
 
 export const showErrorMessageFx = createEffect((error: Error) =>{
-    console.error(error);
+    console.error(error)
     
     notification.error({message: error.message})
 })

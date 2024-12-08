@@ -1,10 +1,11 @@
-import { Form, Input } from "antd";
+import AddCategorysForm from "./AddCategory"
 
 const Admin = () => {
-    
     return (
-        
-    );
-};
+        <>
+            <AddCategorysForm />
+        </>
+    )
+}
 
-export default Admin;
+export default Admin

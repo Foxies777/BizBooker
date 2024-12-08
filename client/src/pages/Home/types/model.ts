@@ -1,22 +1,21 @@
-import { combine, createEffect, createEvent, restore, sample } from "effector";
-import { getBusinesses } from "../../../shared/api/business";
-import { showErrorMessageFx } from "../../../shared/notification";
-
+import { createEffect, restore, sample } from "effector"
+import { getBusinesses, getUserBusinesses } from "../../../shared/api/business"
+import { showErrorMessageFx } from "../../../shared/notification"
+import { Business } from "../../../shared/api/business/model"
 
 export const getBusinessesFx = createEffect(getBusinesses)
 export const $businesses = restore(getBusinessesFx, [])
 
-// export const paginationChanged = createEvent<number>()
-// export const queryChanged = createEvent<string>()
-// export const $pagination = restore(paginationChanged, 1)
-// export const $query = restore(queryChanged, '')
-
-// const $paramsStore = combine({ _q : $query, _page: $pagination})
-
-// sample({
-//     clock: $paramsStore,
-//     source: getBusinessesFx,
-// })
+export const getUserBusinessesFx = createEffect<string, Business[]>(
+    async (token) => {
+        const response = await getUserBusinesses(token)
+        return response
+    }
+)
+export const $userBusinesses = restore<Business[]>(
+    getUserBusinessesFx.doneData,
+    []
+)
 
 sample({
     clock: getBusinessesFx.failData,

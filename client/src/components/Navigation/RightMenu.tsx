@@ -1,4 +1,5 @@
-import { Menu, Avatar, Button } from "antd";
+// RightMenu.tsx
+import { Menu, Avatar, Button, Spin } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import {
     UserOutlined,
@@ -8,11 +9,12 @@ import {
     LoginOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { $isAuth, tokenExprired } from "../../shared/auth";
-import { useUnit } from "effector-react";
 import { BizRoutes } from "../../utils/const";
-import { getUserRole } from "../../utils/auth";
-import { useEffect, useState } from "react";
+import { useBusinesses } from "../../context/BusinessesContext";
+import { useProfile } from "../../context/ProfileContext";
+import { useUnit } from "effector-react";
+import { $isAuth } from "../../shared/auth";
+import { setCurrentBusiness } from "../../shared/business";
 
 interface RightMenuProps {
     mode: "horizontal" | "vertical" | "inline";
@@ -20,22 +22,28 @@ interface RightMenuProps {
 
 const RightMenu = ({ mode }: RightMenuProps) => {
     const navigate = useNavigate();
+    const { user, loading: userLoading, logout } = useProfile();
+    const { businesses, loading: businessesLoading } = useBusinesses();
     const isAuth = useUnit($isAuth);
-    const [user, setUser] = useState(getUserRole());
-
-    useEffect(() => {
-        setUser(getUserRole());
-    }, [isAuth]);
 
     const logoutHandler = () => {
-        tokenExprired();
-        localStorage.removeItem("token");
-        setUser(null);
+        logout();
         navigate("/");
+        console.log("выход");
     };
 
+    const handleBusinessClick = (business: any) => {
+        setCurrentBusiness(business);
+        localStorage.setItem("currentBusiness", JSON.stringify(business));
+        navigate(BizRoutes.BUSINESS_DASHBOARD.replace(":id", business._id));
+    };
+
+    if (userLoading || businessesLoading) {
+        return <Spin />;
+    }
+
     const getMenuItems = () => {
-        if (user) {
+        if (isAuth && user) {
             switch (user.role) {
                 case "admin":
                     return [
@@ -71,6 +79,27 @@ const RightMenu = ({ mode }: RightMenuProps) => {
                             label: (
                                 <Link to={BizRoutes.PROFILE}>
                                     <UserOutlined /> Профиль
+                                </Link>
+                            ),
+                        },
+                        ...businesses.map((business) => ({
+                            key: business._id,
+                            label: (
+                                <div
+                                    onClick={() =>
+                                        handleBusinessClick(business)
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {business.name}
+                                </div>
+                            ),
+                        })),
+                        {
+                            key: "add-business",
+                            label: (
+                                <Link to={BizRoutes.ADDBUSINESS}>
+                                    <PlusOutlined /> Создать бизнес
                                 </Link>
                             ),
                         },
@@ -140,7 +169,7 @@ const RightMenu = ({ mode }: RightMenuProps) => {
                 <>
                     <Avatar icon={<UserOutlined />} />
                     <span className="username">
-                        {user ? "John Doe" : "Guest"}
+                        {user ? user.name : "Guest"}
                     </span>
                 </>
             ),

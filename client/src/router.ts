@@ -1,10 +1,12 @@
-
-import Registration from "./pages/SignUp/ui/SignUp";
-import SignIn from './pages/SignIn/ui/SignIn';
-import { BizRoutes } from './utils/const';
-import Home from "./pages/Home/ui/Home";
-import Profile from "./pages/Profile/ui/Profile";
-import AddBusiness from "./pages/AddBusiness/ui/AddBusiness";
+import { BizRoutes } from './utils/const'
+import Home from "./pages/Home/ui/Home"
+import Profile from "./pages/Profile/ui/Profile"
+import AddBusiness from "./pages/AddBusiness/ui/AddBusiness"
+import Admin from "./pages/Admin/ui/Admin"
+import Business from "./pages/Business/Home/ui/Business"
+import SignIn from './pages/Auth/SignIn/ui/SignIn'
+import Registration from './pages/Auth/SignUp/ui/SignUp'
+import Staffs from './pages/Business/Staff/ui/Staffs'
 
 export const authRoutes = [
     {
@@ -19,6 +21,18 @@ export const authRoutes = [
         path: BizRoutes.ADDBUSINESS,
         Component: AddBusiness,
     },
+    {
+        path: BizRoutes.ADMIN,
+        Component: Admin,
+    },
+    {
+        path: BizRoutes.BUSINESS_DASHBOARD,
+        Component: Business,
+    },
+    {
+        path: BizRoutes.BUSINESS_DASHBOARD_STAFF,
+        Component: Staffs,
+    }
 ]
 export const publicRoutes = [
     {
