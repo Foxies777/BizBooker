@@ -5,9 +5,6 @@ import { AddScheduleForm, AddStaff, Navbar, useGetBusinessStaffs } from ".."
 import { useUnit } from "effector-react"
 import { $currentBusiness } from "../../../../shared/business"
 import BusinessNavbar from "../../../../components/BusinessNavbar"
-
-const { Meta } = Card
-
 const Staffs = () => {
     const [businessStaffs, loading] = useGetBusinessStaffs()
     const [selectedStaff, setSelectedStaff] = useState<string | null>(null)
