@@ -1,22 +1,24 @@
-import { Button, Layout, Card, Row, Col, Spin } from "antd"
-import { CalendarOutlined } from "@ant-design/icons"
-import { useState } from "react"
-import { AddScheduleForm, AddStaff, Navbar, useGetBusinessStaffs } from ".."
-import { useUnit } from "effector-react"
-import { $currentBusiness } from "../../../../shared/business"
-import BusinessNavbar from "../../../../components/BusinessNavbar"
+import { Button, Layout, Card, Row, Col, Spin } from "antd";
+import { AppstoreAddOutlined, CalendarOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { AddScheduleForm, AddStaff, Navbar, useGetBusinessStaffs } from "..";
+import { useUnit } from "effector-react";
+import { $currentBusiness } from "../../../../shared/business";
+import BusinessNavbar from "../../../../components/BusinessNavbar";
+import ModalStaffService from "./ModalStaffService";
+
 const Staffs = () => {
-    const [businessStaffs, loading] = useGetBusinessStaffs()
-    const [selectedStaff, setSelectedStaff] = useState<string | null>(null)
-    const currentBusiness = useUnit($currentBusiness)
+    const [businessStaffs, loading] = useGetBusinessStaffs();
+    const [modalState, setModalState] = useState<{ type: string | null, staffId: string | null }>({ type: null, staffId: null });
+    const currentBusiness = useUnit($currentBusiness);
 
-    const handleAddSchedule = (staffId: string) => {
-        setSelectedStaff(staffId)
-    }
+    const handleOpenModal = (type: string, staffId: string) => {
+        setModalState({ type, staffId });
+    };
 
-    const handleClose = () => {
-        setSelectedStaff(null)
-    }
+    const handleCloseModal = () => {
+        setModalState({ type: null, staffId: null });
+    };
 
     return (
         <Layout style={{ minHeight: "100vh" }}>
@@ -32,13 +34,20 @@ const Staffs = () => {
                                 <Card
                                     title={staff.name}
                                     actions={[
-                                        <Button
-                                            type="link"
-                                            icon={<CalendarOutlined />}
-                                            onClick={() => handleAddSchedule(staff._id)}
-                                            style={{ float: 'right' }}
-                                        >
-                                        </Button>
+                                        <>
+                                            <Button
+                                                type="link"
+                                                icon={<CalendarOutlined />}
+                                                onClick={() => handleOpenModal('schedule', staff._id)}
+                                                style={{ float: "right" }}
+                                            ></Button>
+                                            <Button
+                                                type="link"
+                                                icon={<AppstoreAddOutlined />}
+                                                onClick={() => handleOpenModal('service', staff._id)}
+                                                style={{ float: "right" }}
+                                            ></Button>
+                                        </>,
                                     ]}
                                 >
                                     <p>Email: {staff.email}</p>
@@ -48,17 +57,24 @@ const Staffs = () => {
                         ))}
                     </Row>
                 )}
-                {selectedStaff && (
+                {modalState.type === 'schedule' && modalState.staffId && (
                     <AddScheduleForm
                         visible={true}
-                        onClose={handleClose}
-                        staffId={selectedStaff}
+                        onClose={handleCloseModal}
+                        staffId={modalState.staffId}
                         businessId={currentBusiness?._id}
+                    />
+                )}
+                {modalState.type === 'service' && modalState.staffId && (
+                    <ModalStaffService
+                        visible={true}
+                        onClose={handleCloseModal}
+                        staffId={modalState.staffId}
                     />
                 )}
             </BusinessNavbar>
         </Layout>
-    )
-}
+    );
+};
 
-export default Staffs
+export default Staffs;

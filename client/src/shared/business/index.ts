@@ -1,4 +1,4 @@
-import { createEffect, createEvent, createStore } from "effector"
+import { createEffect, createEvent, createStore, sample } from "effector"
 import {
     Business,
     Category,
@@ -28,13 +28,15 @@ export const addCategoryFx = createEffect(
     }
 )
 
-addBusiness.watch((business) => {
-    addBusinessFx(business)
-})
+sample({
+    clock: addBusiness,
+    target: addBusinessFx,
+});
 
-addCategory.watch((category) => {
-    addCategoryFx(category)
-})
+sample({
+    clock: addCategory,
+    target: addCategoryFx,
+});
 
 
 export const $businesses = createStore<Business[]>([])

@@ -1,4 +1,4 @@
-import { createEffect, createEvent, createStore } from "effector"
+import { createEffect, createEvent, createStore, sample } from "effector"
 import { createStaff } from "../api/staff"
 import { CreateStaffRequest, Staff } from "../api/staff/model"
 
@@ -11,9 +11,9 @@ export const addStaffFx = createEffect(async (staff: CreateStaffRequest): Promis
     return response
 })
 
-
-addStaff.watch((staff) => {
-    addStaffFx(staff)
+sample({
+    clock: addStaff,
+    target: addStaffFx
 })
 
 export const $staff = createStore<Staff[]>([])

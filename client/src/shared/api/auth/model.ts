@@ -11,7 +11,7 @@ export type Body = {
 
 export type Response = {
     token: string
-    user: { email: string id: number }
+    user: { email: string; id: number }
 }
 
 export type User = {

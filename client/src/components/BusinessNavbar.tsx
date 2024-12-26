@@ -36,7 +36,14 @@ const BusinessNavbar: React.FC<BusinessNavProps> = ({children, selectKey}) => {
                         >Главная</Link>
                     </Menu.Item>
                     <Menu.Item key="2" icon={<AppstoreAddOutlined />}>
-                        Услуги
+                    <Link
+                            to={BizRoutes.BUSINESS_DASHBOARD_SERVICE.replace(
+                                ":id",
+                                currentBusiness._id
+                            )}
+                        >
+                            Услуги
+                        </Link>
                     </Menu.Item>
                     <Menu.Item key="3" icon={<LineChartOutlined />}>
                         Аналитика

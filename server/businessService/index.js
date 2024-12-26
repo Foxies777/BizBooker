@@ -5,6 +5,7 @@ const bodyParser = require("body-parser")
 const dotenv = require("dotenv")
 const businessRouter = require("./routes/business")
 const categoryRouter = require("./routes/category")
+const serviceRouter = require("./routes/service")
 
 dotenv.config()
 
@@ -37,7 +38,7 @@ app.use(bodyParser.json())
 
 app.use("/api/business", businessRouter)
 app.use("/api/category", categoryRouter)
-
+app.use("/api/service", serviceRouter)
 
 app.options('*', cors())
 

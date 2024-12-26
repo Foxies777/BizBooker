@@ -6,5 +6,6 @@ export enum BizRoutes {
     ADDBUSINESS = '/add-business',
     ADMIN = '/dashboard',
     BUSINESS_DASHBOARD = '/business/dashboard/:id',
-    BUSINESS_DASHBOARD_STAFF = '/business/dashboard/:id/staff'
+    BUSINESS_DASHBOARD_STAFF = '/business/dashboard/:id/staff',
+    BUSINESS_DASHBOARD_SERVICE = '/business/dashboard/:id/service',
 }

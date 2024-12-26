@@ -7,6 +7,7 @@ import Business from "./pages/Business/Home/ui/Business"
 import SignIn from './pages/Auth/SignIn/ui/SignIn'
 import Registration from './pages/Auth/SignUp/ui/SignUp'
 import Staffs from './pages/Business/Staff/ui/Staffs'
+import Service from './pages/Business/Services/ui/Service'
 
 export const authRoutes = [
     {
@@ -32,6 +33,10 @@ export const authRoutes = [
     {
         path: BizRoutes.BUSINESS_DASHBOARD_STAFF,
         Component: Staffs,
+    },
+    {
+        path: BizRoutes.BUSINESS_DASHBOARD_SERVICE,
+        Component: Service,
     }
 ]
 export const publicRoutes = [
