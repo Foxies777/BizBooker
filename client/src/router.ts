@@ -37,7 +37,7 @@ export const authRoutes = [
     {
         path: BizRoutes.BUSINESS_DASHBOARD_SERVICE,
         Component: Service,
-    }
+    },
 ]
 export const publicRoutes = [
     {

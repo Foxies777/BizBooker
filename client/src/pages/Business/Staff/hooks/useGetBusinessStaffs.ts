@@ -1,13 +1,23 @@
-import { useUnit } from "effector-react"
-import { $businessStaffs, getBusinessStaffsFx, $currentBusiness } from "../index"
-import { useEffect } from "react"
+import { useUnit } from "effector-react";
+import { useEffect } from "react";
+import { $activeStaff, $pendingStaff, fetchBusinessStaffFx } from "../../../../shared/staff";
+import { $currentBusiness } from "../../../../shared/business";
 
+export const useGetBusinessStaffs = () => {
+    const [pendingStaff, activeStaff, business, loading] = useUnit([
+        $pendingStaff,
+        $activeStaff,
+        $currentBusiness,
+        fetchBusinessStaffFx.pending,
+    ]);
 
-export const useGetBusinessStaffs = () =>{
-    const [businessStaffs, loading] = useUnit([$businessStaffs, getBusinessStaffsFx.pending])
-    const currentBusiness = useUnit($currentBusiness)
     useEffect(() => {
-        getBusinessStaffsFx(currentBusiness._id)
-    }, [])
-    return [businessStaffs, loading] as const
-}
+        
+        if (business?._id) {
+            
+            fetchBusinessStaffFx(business._id); 
+        }
+    }, [business?._id]);
+
+    return [pendingStaff, activeStaff, loading] as const;
+};

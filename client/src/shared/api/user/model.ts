@@ -22,5 +22,5 @@ export type User = {
     email: string
     phone: string
     password: string
-    role: "client" | "business" | "admin"
+    role: "client" | "staff" | "business" | "admin"
 }

@@ -1,33 +1,46 @@
-import { api } from "../api"
-import { CreateStaffRequest, Staff } from "./model"
+import { api } from "../api";
+import { Staff, StaffResponse } from "./model";
 
-export const createStaff = async (
-    staff: CreateStaffRequest
-): Promise<Staff> => {
+export const createStaff = async (data: {
+    userId: string;
+    role: string;
+}): Promise<Staff> => {
     try {
-        console.log(staff)
-
-        const response = await api.post("staff/addStaff", {
-            json: staff,
+        console.log(data.role);
+        const updateUser = {
+            role: data.role,
+        };
+        const response = await api.put(`users/${data.userId}`, {
+            json: updateUser,
             headers: {
                 "Content-Type": "application/json",
             },
-        })
-        return response.json()
+        });
+        return response.json();
     } catch (error) {
-        console.error("Error in addStaff:", error)
-        throw new Error("Failed to add staff")
+        console.error("Error in addStaff:", error);
+        throw new Error("Failed to add staff");
     }
-}
-export const getBusinesseStaffs = async (businessId: string) => {
+};
+export const getBusinessStaff = async (businessId:string): Promise<StaffResponse> => {
     try {
-        const response = await api
-            .get(`business/${businessId}/staffs`)
-            .json<Staff[]>()
-        console.log(`Received staffs for business ID ${businessId}:`, response)
-        return response
+        
+        const response = await api.get(`business/${businessId}/staffs`);
+        console.log("ewewewwewwe", response);
+        return response.json();
     } catch (error) {
-        console.error("Error in getBusinesseStaffs:", error)
-        throw new Error("Failed to get staffs")
+        // Handle error
+        console.error("Error in getBusinessStaff:", error);
+        throw new Error("Failed to fetch business staff");
     }
-}
+};
+
+// Добавить услуги к сотруднику
+export const addServicesToStaff = async (staffId: string, serviceIds: string[]) => {
+    return api.post("service/add", {
+        json: { staffId, serviceIds },
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+};

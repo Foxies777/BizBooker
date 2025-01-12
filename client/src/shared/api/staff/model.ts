@@ -1,9 +1,6 @@
 export type CreateStaffRequest = {
-    name: string
-    email: string
-    phone: string
-    service?: string
-    businessId: string
+    _id: string,
+    role: string
 }
 export type Staff = {
     _id: string
@@ -13,3 +10,24 @@ export type Staff = {
     service?: string
     createdAt: string
 }
+export type StaffResponse = {
+    pendingStaff: {
+        id: string;
+        name: string;
+        email: string;
+        phone: string;
+        status: "pending";
+    }[];
+    activeStaff: {
+        id: string;
+        name: string;
+        email: string;
+        phone: string;
+        status: "active";
+        services?: {
+            id: string;
+            name: string;
+            description: string;
+        }[]
+    }[];
+};

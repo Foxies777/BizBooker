@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect} from 'react'
 import { useUnit } from 'effector-react'
 import { $user, getUserFx } from '../index'
 import { $token } from '../../../shared/auth'

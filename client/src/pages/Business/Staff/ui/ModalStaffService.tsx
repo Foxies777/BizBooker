@@ -1,6 +1,7 @@
 import { Button, Form, Modal, Select } from "antd";
 import { useState } from "react";
 import { useGetBusinessService } from "../../Services/hooks/useGetBusinessService";
+import { useAddServices } from "../hooks/useAddServices";
 
 interface ModalStaffServiceProps {
     visible: boolean;
@@ -10,15 +11,15 @@ interface ModalStaffServiceProps {
 
 const ModalStaffService: React.FC<ModalStaffServiceProps> = ({ visible, onClose, staffId }) => {
     const [services, loading] = useGetBusinessService();
+    const { addServices, loading: addLoading } = useAddServices();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const filteredServices = services.filter((s) => !selectedItems.includes(s.name));
 
     const handleFinish = () => {
-        const fetchService = services.filter(s => selectedItems.indexOf(s.name) > -1);
-        console.log(fetchService, staffId);
-        // TODO: Add Service(s) to Staff
-        console.log("Modal staff service has been finished.");
-        onClose();
+        addServices({ staffId, serviceIds: selectedItems }).then(() => {
+            console.log("Услуги успешно добавлены сотруднику");
+            onClose();
+        });
     };
 
     return (
@@ -50,7 +51,7 @@ const ModalStaffService: React.FC<ModalStaffServiceProps> = ({ visible, onClose,
                         onChange={setSelectedItems}
                         style={{ width: "100%" }}
                         options={filteredServices.map((item) => ({
-                            value: item.name,
+                            value: item._id,
                             label: item.name,
                         }))}
                     />
@@ -60,7 +61,7 @@ const ModalStaffService: React.FC<ModalStaffServiceProps> = ({ visible, onClose,
                         style={{ marginTop: "20px" }}
                         type="primary"
                         htmlType="submit"
-                        loading={loading}
+                        loading={loading || addLoading}
                     >
                         Добавить
                     </Button>

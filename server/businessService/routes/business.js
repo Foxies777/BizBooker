@@ -6,14 +6,14 @@ const {
     getBusiness,
     getAllBusinesses,
     updateBusiness,
-    getBusinessStaffs,
+    getBusinessStaff,
 } = require("../controllers/businessController")
 
 router.post("/create", createBusiness)
 
 router.get("/:id", getBusiness)
 router.get("/", getAllBusinesses)
-router.get("/:id/staffs", getBusinessStaffs)
+router.get("/:id/staffs", getBusinessStaff)
 
 router.put("/:id", updateBusiness)
 

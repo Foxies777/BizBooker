@@ -112,6 +112,25 @@ const RightMenu = ({ mode }: RightMenuProps) => {
                             ),
                         },
                     ];
+                case "staff":
+                    return [
+                        {
+                            key: "about-us",
+                            label: (
+                                <Link to={BizRoutes.PROFILE}>
+                                    <UserOutlined /> Профиль
+                                </Link>
+                            ),
+                        },
+                        {
+                            key: "log-out",
+                            label: (
+                                <Button type="link" onClick={logoutHandler}>
+                                    <LogoutOutlined /> Выход
+                                </Button>
+                            ),
+                        },
+                    ];
                 default:
                     return [
                         {
