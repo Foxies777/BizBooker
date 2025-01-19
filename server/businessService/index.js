@@ -6,7 +6,7 @@ const dotenv = require("dotenv")
 const businessRouter = require("./routes/business")
 const categoryRouter = require("./routes/category")
 const serviceRouter = require("./routes/service")
-
+const schedulesRouter = require("./routes/schedule")
 dotenv.config()
 
 const app = express()
@@ -39,7 +39,7 @@ app.use(bodyParser.json())
 app.use("/api/business", businessRouter)
 app.use("/api/category", categoryRouter)
 app.use("/api/service", serviceRouter)
-
+app.use("/api/schedules", schedulesRouter)
 app.options('*', cors())
 
 app.use((req, res, next) => {

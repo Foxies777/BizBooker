@@ -1,21 +1,13 @@
-import { useState } from "react"
-import { useUnit } from "effector-react"
-import { addSchedule } from "../index"
+import { useUnit } from 'effector-react';
+import { createScheduleFx } from '../types/model';
+import { CreateScheduleRequest } from '../../../../shared/api/schedule/model';
 
 export const useCreateSchedule = () => {
-    const [loading, setLoading] = useState(false)
-    const createSchedule = useUnit(addSchedule)
+  const loading = useUnit(createScheduleFx.pending);
 
-    const handleCreateSchedule = (schedule: any) => {
-        setLoading(true)
-        try {
-            createSchedule(schedule)
-        } catch (error) {
-            console.error("Failed to create schedule:", error)
-        } finally {
-            setLoading(false)
-        }
-    }
+  const handleCreateSchedule = async (data: CreateScheduleRequest) => {
+    await createScheduleFx(data);
+  };
 
-    return { handleCreateSchedule, loading }
-}
+  return { handleCreateSchedule, loading };
+};

@@ -23,5 +23,4 @@ export { $currentBusiness } from "../../../shared/business"
 
 //other
 export type { CreateScheduleRequest } from "../../../shared/api/schedule/model"
-export { addSchedule } from "../../../shared/schedule"
 export { $userBusinesses, Navbar } from "../index"

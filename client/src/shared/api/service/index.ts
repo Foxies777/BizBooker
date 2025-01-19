@@ -19,6 +19,8 @@ export const getBusinessServices = async(businessId: string)=>{
         console.log(businessId);
         
         const response = await api.get(`service/${businessId}`).json<Service[]>()
+        console.log('1111111111111112222222222',response);
+        
         return response
     } catch (error) {
         console.error("Services not found", error);

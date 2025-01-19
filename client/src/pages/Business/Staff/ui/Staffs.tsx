@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Layout, Card, Row, Col, Spin } from "antd";
+import { Button, Layout, Card, Row, Col, Spin, Modal } from "antd";
 import { AppstoreAddOutlined, CalendarOutlined } from "@ant-design/icons";
 import { AddScheduleForm, Navbar, useGetBusinessStaffs } from "..";
 import { useUnit } from "effector-react";
@@ -7,6 +7,7 @@ import { $currentBusiness } from "../../../../shared/business";
 import BusinessNavbar from "../../../../components/BusinessNavbar";
 import ModalStaffService from "./ModalStaffService";
 import InviteStaff from "./InviteStaff";
+import StaffScheduleViewer from "./StaffScheduleViewer";
 
 interface Staff {
     id: string;
@@ -17,13 +18,14 @@ interface Staff {
     services?: {
         id: string;
         name: string;
-    }[]
+    }[];
 }
 
 const StaffCard: React.FC<{
     staff: Staff;
     onOpenModal: (type: "schedule" | "service", staffId: string) => void;
-}> = ({ staff, onOpenModal }) => (
+    onViewSchedule: (staff: Staff) => void; // Исправлено название
+}> = ({ staff, onOpenModal, onViewSchedule }) => (
     <Col key={staff.id} xs={24} sm={12} md={8} lg={6}>
         <Card
             title={staff.name}
@@ -53,10 +55,12 @@ const StaffCard: React.FC<{
                     ? staff.services.map((service) => service.name).join(", ")
                     : "Нет услуг"}
             </p>
+            <Button type="link" onClick={() => onViewSchedule(staff)}>
+                Просмотреть расписание
+            </Button>
         </Card>
     </Col>
 );
-
 
 const Staffs: React.FC = () => {
     const [pendingStaff, activeStaff, loading] = useGetBusinessStaffs();
@@ -65,8 +69,9 @@ const Staffs: React.FC = () => {
         type: "schedule" | "service" | null;
         staffId: string | null;
     }>({ type: null, staffId: null });
-    console.log(businessStaffs);
-    
+    const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+    const [isScheduleViewerOpen, setScheduleViewerOpen] = useState(false);
+
     const currentBusiness = useUnit($currentBusiness);
 
     const handleOpenModal = (type: "schedule" | "service", staffId: string) => {
@@ -75,6 +80,16 @@ const Staffs: React.FC = () => {
 
     const handleCloseModal = () => {
         setModalState({ type: null, staffId: null });
+    };
+
+    const handleViewSchedule = (staff: Staff) => {
+        setSelectedStaff(staff);
+        setScheduleViewerOpen(true);
+    };
+
+    const handleCloseScheduleViewer = () => {
+        setSelectedStaff(null);
+        setScheduleViewerOpen(false);
     };
 
     return (
@@ -91,6 +106,7 @@ const Staffs: React.FC = () => {
                                 key={staff.id}
                                 staff={staff}
                                 onOpenModal={handleOpenModal}
+                                onViewSchedule={handleViewSchedule} // Исправлено
                             />
                         ))}
                     </Row>
@@ -110,6 +126,19 @@ const Staffs: React.FC = () => {
                         staffId={modalState.staffId}
                     />
                 )}
+                <Modal
+                    open={isScheduleViewerOpen}
+                    footer={null}
+                    onCancel={handleCloseScheduleViewer}
+                    destroyOnClose
+                >
+                    {selectedStaff && (
+                        <StaffScheduleViewer
+                            staffId={selectedStaff.id}
+                            businessId={currentBusiness._id}
+                        />
+                    )}
+                </Modal>
             </BusinessNavbar>
         </Layout>
     );
