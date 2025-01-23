@@ -15,6 +15,8 @@ import { useProfile } from "../../context/ProfileContext";
 import { useUnit } from "effector-react";
 import { $isAuth } from "../../shared/auth";
 import { setCurrentBusiness } from "../../shared/business";
+import { useStaffBusiness } from "../../pages/Staff/hooks/useStaffBusiness";
+
 
 interface RightMenuProps {
     mode: "horizontal" | "vertical" | "inline";
@@ -24,8 +26,10 @@ const RightMenu = ({ mode }: RightMenuProps) => {
     const navigate = useNavigate();
     const { user, loading: userLoading, logout } = useProfile();
     const { businesses, loading: businessesLoading } = useBusinesses();
+    const [staffBusiness, loading] = useStaffBusiness()
     const isAuth = useUnit($isAuth);
-
+    console.log(staffBusiness);
+    
     const logoutHandler = () => {
         logout();
         navigate("/");
@@ -37,8 +41,14 @@ const RightMenu = ({ mode }: RightMenuProps) => {
         localStorage.setItem("currentBusiness", JSON.stringify(business));
         navigate(BizRoutes.BUSINESS_DASHBOARD.replace(":id", business._id));
     };
-
-    if (userLoading || businessesLoading) {
+    const handleStaffBusinessClick = (business: any) => {
+        console.log('232323232',business);
+        
+        setCurrentBusiness(business);
+        localStorage.setItem("currentBusiness", JSON.stringify(business));
+        navigate(BizRoutes.STAFF_DASHBOARD.replace(":id", business._id));
+    };
+    if (userLoading || businessesLoading || loading) {
         return <Spin />;
     }
 
@@ -122,6 +132,19 @@ const RightMenu = ({ mode }: RightMenuProps) => {
                                 </Link>
                             ),
                         },
+                        ...staffBusiness.map((business) => ({
+                            key: business.businessId._id,
+                            label: (
+                                <div
+                                    onClick={() =>
+                                        handleStaffBusinessClick(business)
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {business.businessId.name}
+                                </div>
+                            ),
+                        })),
                         {
                             key: "log-out",
                             label: (

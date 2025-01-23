@@ -8,6 +8,8 @@ import SignIn from './pages/Auth/SignIn/ui/SignIn'
 import Registration from './pages/Auth/SignUp/ui/SignUp'
 import Staffs from './pages/Business/Staff/ui/Staffs'
 import Service from './pages/Business/Services/ui/Service'
+import StaffPage from './pages/Staff/ui/StaffPage'
+
 
 export const authRoutes = [
     {
@@ -38,6 +40,10 @@ export const authRoutes = [
         path: BizRoutes.BUSINESS_DASHBOARD_SERVICE,
         Component: Service,
     },
+    {
+        path: BizRoutes.STAFF_DASHBOARD,
+        Component: StaffPage
+    }
 ]
 export const publicRoutes = [
     {

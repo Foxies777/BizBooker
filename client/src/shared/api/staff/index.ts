@@ -1,5 +1,5 @@
 import { api } from "../api";
-import { Staff, StaffResponse } from "./model";
+import { Staff, StaffBusinessesResponse, StaffDetailsResponse, StaffResponse } from "./model";
 
 export const createStaff = async (data: {
     userId: string;
@@ -26,7 +26,6 @@ export const getBusinessStaff = async (businessId:string): Promise<StaffResponse
     try {
         
         const response = await api.get(`business/${businessId}/staffs`);
-        console.log("ewewewwewwe", response);
         return response.json();
     } catch (error) {
         // Handle error
@@ -43,4 +42,29 @@ export const addServicesToStaff = async (staffId: string, serviceIds: string[]) 
             "Content-Type": "application/json",
         },
     });
+};
+
+export const getStaffBusinesses = async (staffId: string) =>{
+    try {
+        
+        const response = await api.get(`staff/getBusinesses/${staffId}`);
+        return response.json<StaffBusinessesResponse[]>();
+    } catch (error) {
+        console.error("Error in getStaffBusinesses:", error);
+        throw new Error("Failed to fetch staff business");
+    }
+};
+export const getStaffDetailsByBusiness = async (
+    businessId: string,
+    staffId: string
+): Promise<StaffDetailsResponse> => {
+    try {
+        const response = await api.get(
+            `staff/${businessId}/staff/${staffId}/details`
+        );
+        return response.json<StaffDetailsResponse>();
+    } catch (error) {
+        console.error("Error fetching staff details:", error);
+        throw error;
+    }
 };

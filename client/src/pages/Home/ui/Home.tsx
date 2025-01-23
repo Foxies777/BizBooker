@@ -1,27 +1,39 @@
-import { Spin } from "antd"
+import { Col, Row, Spin } from "antd"
 import Business from "./Business"
 import { useBusinesses } from "../hooks/useBusinesses"
 import Navbar from "../../../components/Navigation"
 const BusinessList = () => {
-    const [businesses, loading] = useBusinesses()
+    const [businesses, loading] = useBusinesses();
 
     if (loading) {
         return (
             <div className="spin">
                 <Spin />
             </div>
-        )
+        );
     }
 
-    return businesses?.map((business: any) => (
-        <Business
-            key={business._id}
-            id={business._id}
-            title={business.name}
-            description={business.description}
-        />
-    ))
-}
+    return (
+        <Row
+            gutter={[
+                { xs: 8, sm: 16, md: 24, lg: 32 }, 
+                { xs: 8, sm: 16, md: 24, lg: 32 },
+            ]}
+        >
+            {businesses.map((business, index) => (
+                <Col
+                    key={index}
+                    xs={24} 
+                    sm={12} 
+                    md={8}
+                    lg={4}
+                >
+                    <Business {...business} />
+                </Col>
+            ))}
+        </Row>
+    );
+};
 
 const Home = () => {
     return (

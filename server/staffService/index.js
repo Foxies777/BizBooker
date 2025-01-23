@@ -4,7 +4,6 @@ const cors = require("cors")
 const bodyParser = require("body-parser")
 const dotenv = require("dotenv")
 const staffRouter = require("./routes/staff")
-const scheduleRuter = require('./routes/schedule')
 
 dotenv.config()
 
@@ -34,7 +33,6 @@ app.use(bodyParser.json())
 
 // Обработка маршрутов
 app.use("/api/staff", staffRouter)
-app.use("/api/staff/schedule", scheduleRuter)
 app.options('*', cors())
 
 app.listen(PORT, () => {
