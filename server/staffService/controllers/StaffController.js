@@ -1,29 +1,31 @@
-const StaffBusiness = require("../models/StaffBusiness")
+const StaffBusiness = require("../models/StaffBusiness");
 const StaffService = require("../models/StaffService");
-const StaffScheduleBusiness  = require("../models/staffScheduleBusiness")
-const Business = require("../models/Business")
-const User = require("../models/User")
+const StaffScheduleBusiness = require("../models/staffScheduleBusiness");
+const Business = require("../models/Business");
+const User = require("../models/User");
 const Service = require("../models/Service");
 const WorkHour = require("../models/WorkHour");
 const Break = require("../models/Break");
 const Shedules = require("../models/Shedules");
-const getStaffBusinesses = async(req, res) => {
-    const {id} = req.params
+const Booking = require("../models/Booking");
+const getStaffBusinesses = async (req, res) => {
+    const { id } = req.params;
     try {
-        const staff = await User.findOne({_id: id})
+        const staff = await User.findOne({ _id: id });
         console.log(staff);
-        
-        const businesses = await StaffBusiness.find({staffId: id}).populate('businessId', "name")
+
+        const businesses = await StaffBusiness.find({ staffId: id }).populate(
+            "businessId",
+            "name"
+        );
         console.log(businesses);
-            
-        res.status(200).json(businesses)
+
+        res.status(200).json(businesses);
     } catch (error) {
         console.error("Ошибка при получении бизнесов для сотрудника", error);
-        res.status(500).send({message: "Ошибка сервера"})        
+        res.status(500).send({ message: "Ошибка сервера" });
     }
-}
-
-
+};
 
 const getStaffDetailsByBusiness = async (req, res) => {
     const { businessId, staffId } = req.params;
@@ -95,7 +97,61 @@ const getStaffDetailsByBusiness = async (req, res) => {
     }
 };
 
-module.exports ={
+const getAllStaffBusinessBookings = async (req, res) => {
+    const { staffId, businessId } = req.params;
+
+    try {
+        // Находим записи с использованием populate для получения связанных данных
+        const staffBookings = await Booking.find({ staffId, businessId })
+            .populate("serviceId", "name duration price") // Подтягиваем данные об услуге
+            .populate("userId", "name surname") // Подтягиваем данные о клиенте
+            .lean();
+
+        if (!staffBookings.length) {
+            return res.status(404).json({
+                message: "Записи для данного сотрудника и бизнеса не найдены.",
+            });
+        }
+
+        // Форматируем данные
+        const formattedBookings = staffBookings.map((booking) => ({
+            serviceName: booking.serviceId.name,
+            serviceDuration: booking.serviceId.duration,
+            servicePrice: booking.serviceId.price,
+            date: new Date(booking.startTime).toLocaleDateString("ru-RU"),
+            startTime: new Date(booking.startTime).toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+            }),
+            endTime: new Date(booking.endTime).toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+            }),
+            clientName: `${booking.userId.surname} ${booking.userId.name}`,
+            status: translateStatus(booking.status), // Перевод статуса
+        }));
+
+        res.status(200).json(formattedBookings);
+    } catch (error) {
+        console.error("Ошибка при получении записей сотрудника:", error);
+        res.status(500).json({ message: "Не удалось получить записи сотрудника." });
+    }
+};
+
+// Функция перевода статусов
+const translateStatus = (status) => {
+    const statusMap = {
+        pending: "Ожидает",
+        confirmed: "Подтверждено",
+        completed: "Завершено",
+        canceled: "Отменено",
+    };
+    return statusMap[status] || "Неизвестный статус";
+};
+
+
+module.exports = {
+    getAllStaffBusinessBookings,
     getStaffBusinesses,
-    getStaffDetailsByBusiness
-}
+    getStaffDetailsByBusiness,
+};

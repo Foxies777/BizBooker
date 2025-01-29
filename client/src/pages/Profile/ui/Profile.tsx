@@ -7,6 +7,7 @@ import { useState } from "react";
 import { sendCodeFx } from "../../../shared/invite";
 import { Invitations } from "../../../shared/api/invite/model";
 import { useCreateStaff } from "../hooks/useCreateStaff";
+import UserBookings from "./UserBookings";
 
 const Profile = () => {
     const { user, loading: userLoading } = useProfile();
@@ -97,6 +98,7 @@ const Profile = () => {
                     businessId={selectedInvite.businessId}
                 />
             )}
+            {user && <UserBookings />}
         </div>
     );
 };

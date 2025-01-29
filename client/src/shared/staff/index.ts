@@ -1,6 +1,6 @@
 import { createEffect, createStore, restore, sample } from "effector";
-import { addServicesToStaff, getBusinessStaff, getStaffBusinesses, getStaffDetailsByBusiness } from "../api/staff";
-import { StaffBusinessesResponse, StaffDetailsResponse, StaffResponse } from "../api/staff/model";
+import { addServicesToStaff, getBusinessStaff, getStaffBookings, getStaffBusinesses, getStaffDetailsByBusiness } from "../api/staff";
+import { Booking, StaffBusinessesResponse, StaffDetailsResponse, StaffResponse } from "../api/staff/model";
 import { showErrorMessageFx } from "../notification";
 export const fetchBusinessStaffFx = createEffect(async (businessId: string) => {
     return await getBusinessStaff(businessId);
@@ -33,6 +33,19 @@ export const fetchStaffDetailsFx = createEffect<
 
 export const $staffDetails = createStore<StaffDetailsResponse | null>(null);
 
+export const fetchStaffBookingsFx = createEffect<
+    { businessId: string; staffId: string },
+    Booking[]
+>(({ businessId, staffId }) => getStaffBookings(businessId, staffId));
+
+// Хранилище для данных записей
+export const $staffBookings = restore<Booking[]>(fetchStaffBookingsFx.doneData, []);
+
+// Обработка ошибок
+sample({
+    clock: fetchStaffBookingsFx.failData,
+    target: showErrorMessageFx,
+});
 sample({
     clock: fetchStaffDetailsFx.doneData,
     target: $staffDetails,

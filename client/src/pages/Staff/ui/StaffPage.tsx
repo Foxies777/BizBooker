@@ -1,16 +1,19 @@
-import React from "react";
 import { useStaffDetails } from "../hooks/useStaffDetails";
 import { Spin, Card, List } from "antd";
 import dayjs from "dayjs";
 import { Navbar } from "../../Business";
+import StaffBookings from "./StaffBooking";
+import { useUnit } from "effector-react";
+import { $user } from "../../Profile";
 
 const StaffPage = () => {
-  const businessId = localStorage.getItem("currentBusiness")
-    
-  
-    const [details, loading] = useStaffDetails(businessId ? JSON.parse(businessId).businessId._id : null);
+    const businessData = localStorage.getItem("currentBusiness");
+    const businessId = businessData ? JSON.parse(businessData).businessId._id : null;
+    const user = useUnit($user)
 
-    if (loading) {
+    const [details, loading] = useStaffDetails(businessId);
+
+    if (loading && !user) {
         return <Spin />;
     }
 
@@ -19,11 +22,10 @@ const StaffPage = () => {
     }
 
     const { business, services, schedule } = details;
-    console.log(schedule);
-    
+
     return (
         <div>
-            <Navbar/>
+            <Navbar />
             <h1>{`Бизнес: ${business.name}`}</h1>
 
             <Card title="Услуги">
@@ -43,13 +45,9 @@ const StaffPage = () => {
             <Card title="Расписание">
                 <p>{`Тип: ${schedule?.scheduleType}`}</p>
                 <p>
-                    {`Даты: ${dayjs(
-                                    schedule?.startDate
-                                ).format("DD.MM.YYYY")} - ${
-                                  dayjs(
-                                    schedule?.endDate
-                                ).format("DD.MM.YYYY")
-                    }`}
+                    {`Даты: ${dayjs(schedule?.startDate).format("DD.MM.YYYY")} - ${dayjs(
+                        schedule?.endDate
+                    ).format("DD.MM.YYYY")}`}
                 </p>
                 <p>{`Выходные: ${schedule?.daysOff?.join(", ") || "Нет"}`}</p>
                 <List
@@ -66,6 +64,10 @@ const StaffPage = () => {
                     )}
                 />
             </Card>
+
+            {businessId && user?._id && (
+                <StaffBookings businessId={businessId} staffId={user._id} />
+            )}
         </div>
     );
 };

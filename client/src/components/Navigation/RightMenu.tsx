@@ -28,7 +28,6 @@ const RightMenu = ({ mode }: RightMenuProps) => {
     const { businesses, loading: businessesLoading } = useBusinesses();
     const [staffBusiness, loading] = useStaffBusiness()
     const isAuth = useUnit($isAuth);
-    console.log(staffBusiness);
     
     const logoutHandler = () => {
         logout();

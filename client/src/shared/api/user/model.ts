@@ -24,3 +24,14 @@ export type User = {
     password: string
     role: "client" | "staff" | "business" | "admin"
 }
+export type Booking = {
+    businessName: string;
+    serviceName: string;
+    serviceDuration: number;
+    servicePrice: number;
+    staffName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    status: string;
+};

@@ -81,3 +81,13 @@ export type StaffDetailsResponse = {
     services: Service[];
     schedule: Schedule | null;
 };
+export type Booking = {
+    serviceName: string;
+    serviceDuration: number;
+    servicePrice: number;
+    date: string; 
+    startTime: string; 
+    endTime: string; 
+    clientName: string;
+    status: string; 
+};

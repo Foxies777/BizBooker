@@ -1,6 +1,6 @@
 import {jwtDecode} from "jwt-decode"
 import { api, errorHandler } from "../api"
-import { User } from "./model"
+import { Booking, User } from "./model"
 
 export const getUser = async (token: string): Promise<User> => {
     try {
@@ -22,3 +22,13 @@ export const getUser = async (token: string): Promise<User> => {
         return await errorHandler(error)
     }
 }
+
+export const getUserBookings = async (userId: string) => {
+    try {
+        const response = await api.get(`users/${userId}/bookings`).json<Booking[]>();
+        return response;
+    } catch (error) {
+        console.error("Ошибка при получении записей пользователя:", error);
+        throw new Error("Не удалось загрузить записи.");
+    }
+};

@@ -15,7 +15,7 @@ const bookingSchema = new Schema(
     },
     staffId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Обратите внимание, что "User" используется как для клиентов, так и для сотрудников
+      ref: "User",
       required: true,
     },
     businessId: {

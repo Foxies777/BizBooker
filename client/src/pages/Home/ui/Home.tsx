@@ -28,7 +28,7 @@ const BusinessList = () => {
                     md={8}
                     lg={4}
                 >
-                    <Business {...business} />
+                    <Business title={business.name} {...business} />
                 </Col>
             ))}
         </Row>

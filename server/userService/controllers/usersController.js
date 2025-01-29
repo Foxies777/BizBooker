@@ -1,4 +1,7 @@
 const User = require("../models/user")
+const Booking = require("../models/Booking")
+const Service = require("../models/Service")
+const Business = require("../models/Business")
 const { getBusinessById } = require("../services/businessService")
 
 
@@ -89,7 +92,59 @@ const getUserBusinesses = async (req, res) => {
         res.status(500).json({ message: "Failed to get user businesses" })
     }
 }
+const getUserBookings = async (req, res) => {
+    const { userId } = req.params;
 
+    try {
+        // Получаем все записи пользователя
+        const userBookings = await Booking.find({ userId })
+            .populate("serviceId", "name duration price") // Данные об услуге
+            .populate("staffId", "name surname") // Данные о сотруднике
+            .populate("businessId", "name") // Название бизнеса
+            .lean();
+
+        if (!userBookings.length) {
+            return res.status(404).json({
+                message: "Записи для данного пользователя не найдены.",
+            });
+        }
+
+        // Форматируем данные перед отправкой
+        const formattedBookings = userBookings.map((booking) => ({
+            businessName: booking.businessId.name,
+            serviceName: booking.serviceId.name,
+            serviceDuration: booking.serviceId.duration,
+            servicePrice: booking.serviceId.price,
+            staffName: `${booking.staffId.surname} ${booking.staffId.name}`,
+            date: new Date(booking.startTime).toLocaleDateString("ru-RU"),
+            startTime: new Date(booking.startTime).toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+            }),
+            endTime: new Date(booking.endTime).toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+            }),
+            status: translateStatus(booking.status),
+        }));
+
+        res.status(200).json(formattedBookings);
+    } catch (error) {
+        console.error("Ошибка при получении записей пользователя:", error);
+        res.status(500).json({ message: "Не удалось получить записи пользователя." });
+    }
+};
+
+// Функция перевода статусов на русский
+const translateStatus = (status) => {
+    const statusMap = {
+        pending: "Ожидает",
+        confirmed: "Подтверждено",
+        completed: "Завершено",
+        canceled: "Отменено",
+    };
+    return statusMap[status] || "Неизвестный статус";
+};
 module.exports = {
     getUserBusinesses,
     getUsers,
@@ -97,4 +152,5 @@ module.exports = {
     createUser,
     updateUser,
     deleteUser,
+    getUserBookings,
 }
