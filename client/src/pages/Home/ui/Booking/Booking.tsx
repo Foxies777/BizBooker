@@ -14,37 +14,28 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [step, setStep] = useState(0);
     const [selectedService, setSelectedService] = useState<string | null>(null);
-    const [selectedServiceDuration, setSelectedServiceDuration] = useState<
-        number | null
-    >(null); // Продолжительность услуги
-    const [selectedSpecialist, setSelectedSpecialist] = useState<string | null>(
-        null
-    );
-    const [selectedDate, setSelectedDate] = useState<string | null>(null);
+    const [selectedServiceDuration, setSelectedServiceDuration] = useState<number | null>(null);
+    const [selectedSpecialist, setSelectedSpecialist] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
+    const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs()); // Храним выбранный месяц
 
     const user = useUnit($user);
     const { services, fetchServices, loading: servicesLoading } = useServices();
-    const {
-        specialists,
-        fetchSpecialists,
-        loading: specialistsLoading,
-    } = useSpecialists();
-    const {
-        availableDates,
-        fetchAvailableDates,
-        loading: datesLoading,
-    } = useAvailableDates();
+    const { specialists, fetchSpecialists, loading: specialistsLoading } = useSpecialists();
+    const { availableDates, fetchAvailableDates, loading: datesLoading } = useAvailableDates();
     const [bookingStatus, createBooking] = useCreateBooking();
 
     const openModal = async () => {
         setModalOpen(true);
         setStep(0);
-        await fetchServices(businessId); // Загружаем только услуги
+        await fetchServices(businessId);
     };
+
     if (!user) {
-        return <div>Вы не авторизованы</div>
+        return <div>Вы не авторизованы</div>;
     }
+
     const closeModal = () => {
         setModalOpen(false);
         resetBooking();
@@ -53,18 +44,17 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
     const resetBooking = () => {
         setStep(0);
         setSelectedService(null);
-        setSelectedServiceDuration(null); // Сброс продолжительности
+        setSelectedServiceDuration(null);
         setSelectedSpecialist(null);
         setSelectedDate(null);
         setSelectedTime(null);
+        setCurrentMonth(dayjs());
     };
 
     const handleServiceSelect = async (serviceId: string) => {
         const service = services.find((s) => s._id === serviceId);
         setSelectedService(serviceId);
-        setSelectedServiceDuration(
-            service?.duration ? Number(service.duration) : null
-        ); // Устанавливаем продолжительность
+        setSelectedServiceDuration(service?.duration ? Number(service.duration) : null);
         setStep(1);
         await fetchSpecialists({ serviceId, businessId });
     };
@@ -80,59 +70,45 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
 
     const handleDateSelect = (date: Dayjs) => {
         const formattedDate = date.format("YYYY-MM-DD");
-        const isDateAvailable = availableDates.some(
-            (d) => d.date === formattedDate
-        );
+        const isDateAvailable = availableDates.some((d) => d.date === formattedDate);
 
         if (isDateAvailable) {
-            setSelectedDate(formattedDate);
-            setStep(3);
+            setSelectedDate(date);
         } else {
             message.error("Эта дата недоступна для записи.");
         }
     };
 
+    const handleConfirmDate = () => {
+        if (selectedDate) {
+            setStep(3);
+        } else {
+            message.error("Выберите доступную дату.");
+        }
+    };
+
     const handleTimeSelect = (time: string) => {
-        console.log("Выбрано время:", time); // Лог для проверки
-        setSelectedTime(time); // Сохраняем только начало времени
+        setSelectedTime(time);
         setStep(4);
     };
 
     const handleBookingConfirm = async () => {
-        if (
-            !selectedService ||
-            !selectedSpecialist ||
-            !selectedDate ||
-            !selectedTime ||
-            !selectedServiceDuration
-        ) {
+        if (!selectedService || !selectedSpecialist || !selectedDate || !selectedTime || !selectedServiceDuration) {
             message.error("Заполните все поля для завершения записи.");
             return;
         }
 
         try {
-            // Логирование для диагностики
-            console.log("Selected values:", {
-                selectedService,
-                selectedSpecialist,
-                selectedDate,
-                selectedTime,
-            });
-
-            const startDateTime = dayjs(
-                `${selectedDate}T${selectedTime}`
-            ).toISOString();
-            const endDateTime = dayjs(startDateTime)
-                .add(selectedServiceDuration, "minute")
-                .toISOString(); // Рассчитываем `endTime`
+            const startDateTime = selectedDate.hour(parseInt(selectedTime.split(":")[0])).minute(parseInt(selectedTime.split(":")[1])).toISOString();
+            const endDateTime = dayjs(startDateTime).add(selectedServiceDuration, "minute").toISOString();
 
             await createBooking({
                 userId: user._id,
                 businessId,
                 serviceId: selectedService,
                 staffId: selectedSpecialist,
-                startTime: startDateTime, // Формат ISO
-                endTime: endDateTime, // Формат ISO
+                startTime: startDateTime,
+                endTime: endDateTime,
                 status: "pending",
                 price: 0,
             });
@@ -144,11 +120,11 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
             message.error("Ошибка при создании записи.");
         }
     };
-    const selectedDay = availableDates.find(
-        (d) => d.date === selectedDate
-    )
-    console.log(selectedDay?.times.map(time => time));
-    
+
+    const handleCalendarPanelChange = (date: Dayjs) => {
+        setCurrentMonth(date);
+    };
+
     const renderStep = () => {
         switch (step) {
             case 0:
@@ -189,41 +165,38 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
                 return datesLoading ? (
                     <Spin />
                 ) : (
-                    <Calendar
-                        fullscreen={false}
-                        disabledDate={(current) => {
-                            if (!current || current < dayjs().startOf("day")) {
-                                return true;
-                            }
-                            const formattedDate = current.format("YYYY-MM-DD");
-                            return !availableDates.some(
-                                (d) => d.date === formattedDate
-                            );
-                        }}
-                        onSelect={handleDateSelect}
-                    />
+                    <div>
+                        <Calendar
+                            fullscreen={false}
+                            disabledDate={(current) => {
+                                if (!current || current < dayjs().startOf("day")) {
+                                    return true;
+                                }
+                                const formattedDate = current.format("YYYY-MM-DD");
+                                return !availableDates.some((d) => d.date === formattedDate);
+                            }}
+                            onSelect={handleDateSelect}
+                            onPanelChange={handleCalendarPanelChange}
+                            value={selectedDate || currentMonth}
+                        />
+                        <Button type="primary" onClick={handleConfirmDate} disabled={!selectedDate}>
+                            Подтвердить дату
+                        </Button>
+                    </div>
                 );
 
             case 3:
-                const selectedDay = availableDates.find(
-                    (d) => d.date === selectedDate
-                );
+                const selectedDay = availableDates.find((d) => d.date === selectedDate?.format("YYYY-MM-DD"));
                 return (
                     <div>
                         {selectedDay?.times.map((start) => (
-                            <Button
-                                key={start}
-                                onClick={() =>
-                                    handleTimeSelect(
-                                        start
-                                    )
-                                }
-                            >
+                            <Button key={start} onClick={() => handleTimeSelect(start)}>
                                 {start}
                             </Button>
                         ))}
                     </div>
-                )
+                );
+
             case 4:
                 return (
                     <Button type="primary" onClick={handleBookingConfirm}>

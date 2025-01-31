@@ -2,16 +2,18 @@ import { Button, Form, Input, Select } from "antd"
 import { useCreateBusiness } from "../hooks/useCreateBusiness"
 import { CreateBusinessRequest } from "../../../shared/api/business/model"
 import { useGetCategory } from "../hooks/useGetCategory"
+import { Navigate, useNavigate } from "react-router-dom"
 
 
 const AddBusinessForm = () => {
     const { handleCreateBusiness, loading } = useCreateBusiness()
     const [categories, catLoading] = useGetCategory()
     const [form] = Form.useForm()
-
+    const navigate = useNavigate()
     const onFinish = (values: Omit<CreateBusinessRequest, 'userId'>) => {
         console.log('Form values:', values)
         handleCreateBusiness(values)
+        navigate('/profile')
     }
 
     return (

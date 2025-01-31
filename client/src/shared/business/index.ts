@@ -6,11 +6,13 @@ import {
     CreateCategoryRequest,
 } from "../api/business/model"
 import { createBusiness, createCategory } from "../api/business"
+import { showSuccessMessageFx } from "../notification"
+
 
 export const addBusiness = createEvent<CreateBusinessRequest>()
 export const addCategory = createEvent<CreateCategoryRequest>()
 
-
+export const resetForm = createEvent<void>();
 
 export const addBusinessFx = createEffect(
     async (business: CreateBusinessRequest) => {
@@ -27,6 +29,13 @@ export const addCategoryFx = createEffect(
         return response
     }
 )
+
+
+sample({
+    clock: addCategoryFx.doneData,
+    fn: () => 'Категория добавлена',
+    target: [showSuccessMessageFx, resetForm], // Триггерим resetForm
+});
 
 sample({
     clock: addBusiness,

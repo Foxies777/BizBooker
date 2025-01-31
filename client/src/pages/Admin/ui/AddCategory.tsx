@@ -1,15 +1,26 @@
-import { Button, Form, Input } from "antd"
-import { CreateCategoryRequest } from "../../../shared/api/business/model"
-import { useCreateCategory } from "../hooks/useBusinesses"
+import { useEffect } from "react";
+import { Button, Form, Input } from "antd";
+import { useCreateCategory } from "../hooks/useBusinesses"; // Импортируем resetForm
+import { CreateCategoryRequest } from "../../../shared/api/business/model";
+import { resetForm } from "../../../shared/business";
 
 const AddCategorysForm = () => {
-    const { handleCreateCategory, loading } = useCreateCategory()
-    const [form] = Form.useForm()
+    const { handleCreateCategory, loading } = useCreateCategory();
+    const [form] = Form.useForm();
+
+    
+    useEffect(() => {
+        const unsubscribe = resetForm.watch(() => {
+            form.resetFields(); 
+        });
+
+        return () => unsubscribe(); 
+    }, [form]);
 
     const onFinish = (values: CreateCategoryRequest) => {
-        console.log('Form values:', values)
-        handleCreateCategory(values)
-    }
+        console.log('Form values:', values);
+        handleCreateCategory(values);
+    };
 
     return (
         <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -26,7 +37,7 @@ const AddCategorysForm = () => {
                 </Button>
             </Form.Item>
         </Form>
-    )
-}
+    );
+};
 
-export default AddCategorysForm
+export default AddCategorysForm;
