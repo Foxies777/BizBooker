@@ -1,0 +1,55 @@
+/* Service.css */
+
+/* Общие стили для контейнера */
+.service-grid {
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+/* Стили для карточки услуги */
+.service-card {
+    background: white;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Стили для заголовка карточки */
+.service-card .ant-card-head-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1890ff;
+}
+
+/* Стили для текста внутри карточки */
+.service-description {
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.service-duration {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.service-price {
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Стили для спиннера загрузки */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}

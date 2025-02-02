@@ -1,0 +1,59 @@
+/* StaffPage.css */
+
+.staff-page {
+    padding: 20px;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+}
+
+.business-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1890ff;
+}
+
+.content-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.services-card, .calendar-card, .schedule-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+.services-card .ant-card-body, .calendar-card .ant-card-body, .schedule-card .ant-card-body {
+    padding: 20px;
+}
+
+.service-item, .work-hour-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 0;
+}
+
+.service-item:last-child, .work-hour-item:last-child {
+    border-bottom: none;
+}
+
+.calendar-card .ant-picker-calendar {
+    border: none;
+    background: transparent;
+}
+
+.calendar-card .ant-picker-calendar-header {
+    display: none;
+}
+
+.calendar-card .ant-picker-cell-inner {
+    border-radius: 50%;
+}
+
+.calendar-card .ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: #1890ff;
+    color: white;
+}

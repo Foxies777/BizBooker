@@ -8,6 +8,7 @@ import BusinessNavbar from "../../../../components/BusinessNavbar";
 import ModalStaffService from "./ModalStaffService";
 import InviteStaff from "./InviteStaff";
 import StaffScheduleViewer from "./StaffScheduleViewer";
+import "../styles/Staffs.css"; // Импортируем стили
 
 interface Staff {
     id: string;
@@ -24,26 +25,27 @@ interface Staff {
 const StaffCard: React.FC<{
     staff: Staff;
     onOpenModal: (type: "schedule" | "service", staffId: string) => void;
-    onViewSchedule: (staff: Staff) => void; // Исправлено название
+    onViewSchedule: (staff: Staff) => void;
 }> = ({ staff, onOpenModal, onViewSchedule }) => (
     <Col key={staff.id} xs={24} sm={12} md={8} lg={6}>
         <Card
             title={staff.name}
+            className="staff-card"
             actions={[
-                <>
+                <div className="card-actions">
                     <Button
                         type="link"
                         icon={<CalendarOutlined />}
                         onClick={() => onOpenModal("schedule", staff.id)}
-                        style={{ float: "right" }}
+                        className="action-button"
                     />
                     <Button
                         type="link"
                         icon={<AppstoreAddOutlined />}
                         onClick={() => onOpenModal("service", staff.id)}
-                        style={{ float: "right" }}
+                        className="action-button"
                     />
-                </>,
+                </div>,
             ]}
         >
             <p>Email: {staff.email || "Не указано"}</p>
@@ -55,7 +57,11 @@ const StaffCard: React.FC<{
                     ? staff.services.map((service) => service.name).join(", ")
                     : "Нет услуг"}
             </p>
-            <Button type="link" onClick={() => onViewSchedule(staff)}>
+            <Button
+                type="link"
+                onClick={() => onViewSchedule(staff)}
+                className="view-schedule-button"
+            >
                 Просмотреть расписание
             </Button>
         </Card>
@@ -98,15 +104,15 @@ const Staffs: React.FC = () => {
             <BusinessNavbar selectKey="4">
                 <InviteStaff businessId={currentBusiness?._id} />
                 {loading ? (
-                    <Spin />
+                    <Spin className="loading-spinner" />
                 ) : (
-                    <Row gutter={[16, 16]}>
+                    <Row gutter={[16, 16]} className="staff-grid">
                         {businessStaffs.map((staff: Staff) => (
                             <StaffCard
                                 key={staff.id}
                                 staff={staff}
                                 onOpenModal={handleOpenModal}
-                                onViewSchedule={handleViewSchedule} // Исправлено
+                                onViewSchedule={handleViewSchedule}
                             />
                         ))}
                     </Row>
@@ -131,6 +137,7 @@ const Staffs: React.FC = () => {
                     footer={null}
                     onCancel={handleCloseScheduleViewer}
                     destroyOnClose
+                    className="schedule-viewer-modal"
                 >
                     {selectedStaff && (
                         <StaffScheduleViewer

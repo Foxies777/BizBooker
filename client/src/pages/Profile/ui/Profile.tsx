@@ -1,13 +1,14 @@
+import React, { useState } from "react";
 import Navbar from "../../../components/Navigation";
 import { Button, Spin, List } from "antd";
 import { useProfile } from "../../../context/ProfileContext";
 import { useGetInvites } from "../hooks/useGetInvites";
 import VerificationModal from "./VerificationModal";
-import { useState } from "react";
 import { sendCodeFx } from "../../../shared/invite";
 import { Invitations } from "../../../shared/api/invite/model";
 import { useCreateStaff } from "../hooks/useCreateStaff";
 import UserBookings from "./UserBookings";
+import "../styles/Profile.css"
 
 const Profile = () => {
     const { user, loading: userLoading } = useProfile();
@@ -18,7 +19,6 @@ const Profile = () => {
 
     const handleVerifyClick = async (invite: Invitations) => {
         try {
-            console.log(invite.userId);
             await sendCodeFx({ userId: invite.userId });
             setSelectedInvite(invite);
             setVisible(true);
@@ -26,6 +26,7 @@ const Profile = () => {
             console.error("Ошибка при отправке кода:", error);
         }
     };
+
     const handleClickStaff = () => {
         const userId = user?._id;
         handleUpdateStaff(userId ?? "", "staff");
@@ -35,61 +36,82 @@ const Profile = () => {
         setSelectedInvite(null);
         setVisible(false);
     };
+
     if (userLoading) {
-        return <Spin />;
+        return (
+            <div className="spin-container">
+                <Spin size="large" />
+            </div>
+        );
     }
-    console.log(invites);
 
     return (
-        <div>
+        <div className="profile-container">
             <Navbar />
             {user ? (
                 <>
-                    <h1>
-                        Welcome, {user.name} {user.surname}
-                    </h1>
-                    <p>Role: {user.role}</p>
-                    <p>Email: {user.email}</p>
-                    <p>Phone: {user.phone}</p>
-                    {user.role === "client" && (
-                        <Button type="primary" onClick={handleClickStaff}>
-                            Стать сотрудником
-                        </Button>
-                    )}
+                    <div className="profile-header">
+                        <h1>
+                            Welcome, {user.name} {user.surname}
+                        </h1>
+                    </div>
+                    <div className="profile-info">
+                        <p>
+                            Role: <span className="role">{user.role}</span>
+                        </p>
+                        <p>Email: {user.email}</p>
+                        <p>Phone: {user.phone}</p>
+                        {user.role === "client" && (
+                            <Button type="primary" onClick={handleClickStaff}>
+                                Стать сотрудником
+                            </Button>
+                        )}
+                    </div>
                 </>
             ) : (
-                <div>
+                <div className="no-data">
                     <h1>Профиль</h1>
                     <p>Нет доступных пользовательских данных.</p>
                 </div>
             )}
-            <h2>Приглашения</h2>
-            {invitesLoading ? (
-                <Spin />
-            ) : invites.length > 0 ? (
-                <List
-                    dataSource={invites}
-                    renderItem={(invite) => (
-                        <List.Item
-                            actions={[
-                                <Button
-                                    type="link"
-                                    onClick={() => handleVerifyClick(invite)}
-                                >
-                                    Принять
-                                </Button>,
-                            ]}
-                        >
-                            <List.Item.Meta
-                                title={invite.businessId.name}
-                                description={`Приглашение от бизнеса: ${invite.businessId.name}`}
+            {user?.role === "staff" && (
+                <div className="invitations-section">
+                    <h2>Приглашения</h2>
+                    {invitesLoading ? (
+                        <div className="spin-container">
+                            <Spin size="large" />
+                        </div>
+                    ) : invites.length > 0 ? (
+                        <div className="invitations-list">
+                            <List
+                                dataSource={invites}
+                                renderItem={(invite) => (
+                                    <List.Item
+                                        actions={[
+                                            <Button
+                                                type="link"
+                                                onClick={() =>
+                                                    handleVerifyClick(invite)
+                                                }
+                                            >
+                                                Принять
+                                            </Button>,
+                                        ]}
+                                    >
+                                        <List.Item.Meta
+                                            title={invite.businessId.name}
+                                            description={`Приглашение от бизнеса: ${invite.businessId.name}`}
+                                        />
+                                    </List.Item>
+                                )}
                             />
-                        </List.Item>
+                        </div>
+                    ) : (
+                        <p className="no-data">Нет активных приглашений.</p>
                     )}
-                />
-            ) : (
-                <p>Нет активных приглашений.</p>
+                </div>
             )}
+
             {selectedInvite && (
                 <VerificationModal
                     visible={visible}

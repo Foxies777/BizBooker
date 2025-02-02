@@ -12,3 +12,13 @@ export type Service = {
     duration: string;
     price: string;
 };
+export type UpdateServiceRequest = {
+    name?: string;
+    description?: string;
+    duration?: string;
+    price?: string;
+};
+
+export type DeleteServiceRequest = {
+    serviceId: string;
+};

@@ -2,7 +2,7 @@ export type Business = {
     _id: string;
     name: string;
     description: string;
-    category: string;
+    category: Category;
     address: string;
     phone: string;
     email: string;

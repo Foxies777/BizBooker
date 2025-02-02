@@ -34,8 +34,45 @@ const getServicesByBusinessId = async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 }
+const updateService = async (req, res) => {
+    const { serviceId } = req.params;
+    const updateData = req.body;
 
+    try {
+        const service = await Service.findById(serviceId);
+        if (!service) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+
+        Object.assign(service, updateData);
+        const updatedService = await service.save();
+
+        res.status(200).json(updatedService);
+    } catch (err) {
+        console.error("Error updating service:", err);
+        res.status(400).json({ message: err.message });
+    }
+};
+
+// Удаление услуги
+const deleteService = async (req, res) => {
+    const { serviceId } = req.params;
+
+    try {
+        const service = await Service.findByIdAndDelete(serviceId);
+        if (!service) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+
+        res.status(200).json({ message: "Service deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting service:", err);
+        res.status(400).json({ message: err.message });
+    }
+};
 module.exports={
     createService,
     getServicesByBusinessId,
+    deleteService,
+    updateService,
 }
