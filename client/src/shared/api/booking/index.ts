@@ -54,6 +54,8 @@ export const getAvailableDatesForServiceAndStaff = async (
   serviceId: string,
   staffId: string
 ) => {
+  console.log("&&\n", serviceId);
+  
   try {
     const response = await api.get(
       `booking/booking-from-service/available-dates?serviceId=${serviceId}&staffId=${staffId}`

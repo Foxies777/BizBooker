@@ -5,6 +5,7 @@ const Business = require("../models/Business");
 const User = require("../models/User");
 const StaffService = require("../models/StaffService");
 const Category = require("../models/Category");
+const Service = require("../models/Service");
 const { getUserById } = require("../services/userService");
 
 // Создание нового бизнеса
@@ -108,21 +109,31 @@ const getBusinessStaff = async (req, res) => {
             return res.status(400).send({ message: "ID бизнеса обязателен." });
         }
 
+        // Получаем приглашения
         const invitations = await Invitation.find({
             businessId: id,
             status: "pending",
         }).populate("userId", "name email phone");
 
+        // Получаем связи сотрудников с бизнесом
         const staffRelations = await StaffBusiness.find({
             businessId: id,
         }).populate("staffId", "name email phone");
 
-        // Получаем услуги для каждого сотрудника
+        // Получаем ID всех сотрудников, связанных с бизнесом
+        const staffIds = staffRelations.map((relation) => relation.staffId._id);
+
+        // Получаем все услуги, связанные с бизнесом
+        const businessServices = await Service.find({ businessId: id }).lean();
+        const serviceIds = businessServices.map((service) => service._id);
+
+        // Получаем услуги для всех сотрудников бизнеса
         const staffServices = await StaffService.find({
-            staffId: { $in: staffRelations.map((relation) => relation.staffId._id) },
+            staffId: { $in: staffIds },
+            serviceId: { $in: serviceIds }, // Фильтруем по услугам бизнеса
         }).populate("serviceId", "name description");
 
-        // Формируем данные для ответа
+        // Формируем список ожидающих сотрудников
         const pendingStaff = invitations.map((invite) => ({
             id: invite._id,
             name: invite.userId?.name || "N/A",
@@ -131,12 +142,15 @@ const getBusinessStaff = async (req, res) => {
             status: "pending",
         }));
 
+        // Формируем список активных сотрудников с их услугами
         const activeStaff = staffRelations.map((relation) => {
+            // Находим услуги для текущего сотрудника
             const services = staffServices
                 .filter((service) => service.staffId.equals(relation.staffId._id))
                 .map((service) => ({
                     id: service.serviceId._id,
-                    name: service.serviceId.name
+                    name: service.serviceId.name,
+                    description: service.serviceId.description,
                 }));
 
             return {
@@ -149,6 +163,7 @@ const getBusinessStaff = async (req, res) => {
             };
         });
 
+        
         res.status(200).send({ pendingStaff, activeStaff });
     } catch (error) {
         console.error("Ошибка при получении сотрудников бизнеса:", error);

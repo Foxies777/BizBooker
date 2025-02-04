@@ -8,6 +8,7 @@ import { useCreateBooking } from "../../hooks/useCreateBooking";
 import { useUnit } from "effector-react";
 import { $user } from "../../../Profile";
 import "../../styles/Booking.css"; // Импортируем стили
+import { modalClosed } from "../../../../shared/booking";
 
 const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
     const [isModalOpen, setModalOpen] = useState(false);
@@ -59,6 +60,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
         setSelectedSpecialist(null);
         setSelectedDate(null);
         setSelectedTime(null);
+        modalClosed()
         setCurrentMonth(dayjs());
     };
 
@@ -156,7 +158,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
             setStep(step - 1);
         }
     };
-
+    
     const renderStep = () => {
         switch (step) {
             case 0:
@@ -165,7 +167,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
                 ) : (
                     <div className="booking-step">
                         <h3>Выберите услугу</h3>
-                        {services.map((service) => (
+                        {services.length > 0 ? services.map((service) => (
                             <div
                                 key={service._id}
                                 className={`service-card ${
@@ -177,7 +179,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
                             >
                                 {service.name}
                             </div>
-                        ))}
+                        )): <p>На данный момент нету услуг, зайдите позже</p>}
                     </div>
                 );
 

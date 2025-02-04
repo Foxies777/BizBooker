@@ -1,30 +1,45 @@
 import { Button, Form, Modal, Select } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGetBusinessService } from "../../Services/hooks/useGetBusinessService";
 import { useAddServices } from "../hooks/useAddServices";
 
 interface ModalStaffServiceProps {
     visible: boolean;
     onClose: () => void;
-    staffId: string;
+    staff: {
+        id: string;
+        services?: {
+            id: string;
+            name: string;
+        }[];
+    };
 }
 
-const ModalStaffService: React.FC<ModalStaffServiceProps> = ({ visible, onClose, staffId }) => {
+const ModalStaffService: React.FC<ModalStaffServiceProps> = ({ visible, onClose, staff }) => {
     const [services, loading] = useGetBusinessService();
     const { addServices, loading: addLoading } = useAddServices();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
-    const filteredServices = services.filter((s) => !selectedItems.includes(s.name));
+
+    useEffect(() => {
+        if (visible && staff.services) {
+            setSelectedItems(staff.services.map((service) => service.id));
+        }
+    }, [visible, staff.services]);
+
+    const filteredServices = services.filter(
+        (service) => !staff.services?.some((staffService) => staffService.id === service._id)
+    );
 
     const handleFinish = () => {
-        addServices({ staffId, serviceIds: selectedItems }).then(() => {
-            console.log("Услуги успешно добавлены сотруднику");
+        addServices({ staffId: staff.id, serviceIds: selectedItems }).then(() => {
+            console.log("Услуги успешно добавлены/обновлены");
             onClose();
         });
     };
 
     return (
         <Modal
-            title="Добавить услуги"
+            title="Управление услугами сотрудника"
             open={visible}
             onCancel={onClose}
             footer={null}
@@ -34,36 +49,32 @@ const ModalStaffService: React.FC<ModalStaffServiceProps> = ({ visible, onClose,
                 name="basic"
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
-                initialValues={{ remember: true }}
                 autoComplete="off"
                 onFinish={handleFinish}
             >
-                <Form.Item
-                    name="services"
-                    rules={[{ required: true }]}
-                    labelCol={{ span: 24 }}
-                    wrapperCol={{ span: 24 }}
-                >
+                <Form.Item name="services" rules={[{ required: true }]} labelCol={{ span: 24 }} wrapperCol={{ span: 24 }}>
                     <Select
                         mode="multiple"
                         placeholder="Выберите услугу (-и)"
                         value={selectedItems}
                         onChange={setSelectedItems}
                         style={{ width: "100%" }}
-                        options={filteredServices.map((item) => ({
-                            value: item._id,
-                            label: item.name,
-                        }))}
+                        options={[
+                            ...staff.services?.map((service) => ({
+                                value: service.id,
+                                label: service.name,
+                                disabled: true, // Услуги уже у сотрудника, их нельзя снять
+                            })) || [],
+                            ...filteredServices.map((service) => ({
+                                value: service._id,
+                                label: service.name,
+                            })),
+                        ]}
                     />
                 </Form.Item>
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                    <Button
-                        style={{ marginTop: "20px" }}
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading || addLoading}
-                    >
-                        Добавить
+                    <Button style={{ marginTop: "20px" }} type="primary" htmlType="submit" loading={loading || addLoading}>
+                        Обновить / Добавить
                     </Button>
                 </Form.Item>
             </Form>

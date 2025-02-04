@@ -89,10 +89,18 @@ const getSpecialistsByServiceAndBusiness = async (req, res) => {
 
 // Получение доступного времени для специалиста
 const getAvailableDatesForServiceAndStaff = async (req, res) => {
-    const { serviceId, staffId } = req.query;
+    const { serviceId, staffId } = req.query; // Убираем serviceDuration из запроса, так как будем получать его из БД
     console.log(req.query);
 
     try {
+        // Получаем длительность услуги из базы данных
+        const service = await Service.findById(serviceId).lean();
+        if (!service) {
+            return res.status(404).json({ message: "Услуга не найдена" });
+        }
+        const serviceDuration = service.duration; // Предположим, что длительность хранится в поле `duration`
+        console.log("Service Duration: ", serviceDuration);
+
         // Получаем расписания сотрудника
         const staffSchedules = await StaffScheduleBusiness.find({ staffId }).populate({
             path: "scheduleId",
@@ -145,35 +153,38 @@ const getAvailableDatesForServiceAndStaff = async (req, res) => {
 
                 while (currentStart < workEnd) {
                     const nextInterval = new Date(
-                        currentStart.getTime() + 30 * 60 * 1000
-                    ); // Интервал в 30 минут
+                        currentStart.getTime() + serviceDuration * 60 * 1000
+                    ); // Интервал в зависимости от длительности услуги
 
                     const isBooked = existingBookings.some(
                         (bt) =>
-                            currentStart >= new Date(bt.startTime) &&
-                            currentStart < new Date(bt.endTime)
+                            (currentStart >= new Date(bt.startTime) && currentStart < new Date(bt.endTime)) ||
+                            (nextInterval > new Date(bt.startTime) && nextInterval <= new Date(bt.endTime)) ||
+                            (currentStart <= new Date(bt.startTime) && nextInterval >= new Date(bt.endTime))
                     );
 
                     const isInBreak = breaks.some(
                         (br) =>
-                            currentStart >= parseTimeToDate(br.startBreak, date) &&
-                            currentStart < parseTimeToDate(br.endBreak, date)
+                            (currentStart >= parseTimeToDate(br.startBreak, date) && currentStart < parseTimeToDate(br.endBreak, date)) ||
+                            (nextInterval > parseTimeToDate(br.startBreak, date) && nextInterval <= parseTimeToDate(br.endBreak, date)) ||
+                            (currentStart <= parseTimeToDate(br.startBreak, date) && nextInterval >= parseTimeToDate(br.endBreak, date))
                     );
 
                     if (!isBooked && !isInBreak && nextInterval <= workEnd) {
                         availableTimes.push({ start: currentStart, end: nextInterval });
                     }
 
-                    currentStart = nextInterval;
+                    currentStart = new Date(currentStart.getTime() + 30 * 60 * 1000); // Переход на следующий интервал в 30 минут
                 }
             });
-            
+
             return {
                 date: date.toISOString().split("T")[0],
                 availableTimes,
             };
         });
 
+        console.log("availableDates", availableDates);
         res.status(200).json(availableDates);
     } catch (error) {
         console.error("Ошибка при получении доступных дат:", error);

@@ -24,7 +24,7 @@ interface Staff {
 
 const StaffCard: React.FC<{
     staff: Staff;
-    onOpenModal: (type: "schedule" | "service", staffId: string) => void;
+    onOpenModal: (type: "schedule" | "service", staff: Staff) => void;
     onViewSchedule: (staff: Staff) => void;
 }> = ({ staff, onOpenModal, onViewSchedule }) => (
     <Col key={staff.id} xs={24} sm={12} md={8} lg={6}>
@@ -36,13 +36,13 @@ const StaffCard: React.FC<{
                     <Button
                         type="link"
                         icon={<CalendarOutlined />}
-                        onClick={() => onOpenModal("schedule", staff.id)}
+                        onClick={() => onOpenModal("schedule", staff)}
                         className="action-button"
                     />
                     <Button
                         type="link"
                         icon={<AppstoreAddOutlined />}
-                        onClick={() => onOpenModal("service", staff.id)}
+                        onClick={() => onOpenModal("service", staff)}
                         className="action-button"
                     />
                 </div>,
@@ -73,19 +73,19 @@ const Staffs: React.FC = () => {
     const businessStaffs = [...pendingStaff, ...activeStaff];
     const [modalState, setModalState] = useState<{
         type: "schedule" | "service" | null;
-        staffId: string | null;
-    }>({ type: null, staffId: null });
+        staff: Staff | null;
+    }>({ type: null, staff: null });
     const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
     const [isScheduleViewerOpen, setScheduleViewerOpen] = useState(false);
 
     const currentBusiness = useUnit($currentBusiness);
 
-    const handleOpenModal = (type: "schedule" | "service", staffId: string) => {
-        setModalState({ type, staffId });
+    const handleOpenModal = (type: "schedule" | "service", staff: Staff) => {
+        setModalState({ type, staff });
     };
 
     const handleCloseModal = () => {
-        setModalState({ type: null, staffId: null });
+        setModalState({ type: null, staff: null });
     };
 
     const handleViewSchedule = (staff: Staff) => {
@@ -117,19 +117,19 @@ const Staffs: React.FC = () => {
                         ))}
                     </Row>
                 )}
-                {modalState.type === "schedule" && modalState.staffId && (
+                {modalState.type === "schedule" && modalState.staff && (
                     <AddScheduleForm
                         visible={true}
                         onClose={handleCloseModal}
-                        staffId={modalState.staffId}
+                        staffId={modalState.staff.id}
                         businessId={currentBusiness?._id}
                     />
                 )}
-                {modalState.type === "service" && modalState.staffId && (
+                {modalState.type === "service" && modalState.staff && (
                     <ModalStaffService
                         visible={true}
                         onClose={handleCloseModal}
-                        staffId={modalState.staffId}
+                        staff={modalState.staff}
                     />
                 )}
                 <Modal
@@ -150,5 +150,4 @@ const Staffs: React.FC = () => {
         </Layout>
     );
 };
-
-export default Staffs;
+export default Staffs
