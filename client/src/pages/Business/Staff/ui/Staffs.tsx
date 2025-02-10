@@ -97,7 +97,8 @@ const Staffs: React.FC = () => {
         setSelectedStaff(null);
         setScheduleViewerOpen(false);
     };
-
+    console.log('1111111111111 ',businessStaffs);
+    
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <Navbar />

@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { useStaffDetails } from "../hooks/useStaffDetails";
-import { Spin, Card, List, Calendar, message } from "antd";
+import { Spin, Card, List, Calendar, message, Select } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { Navbar } from "../../Business";
-import StaffBookings from "./StaffBooking";
+import StaffEarnings from "./StaffEarnings"; // ✅ Импортируем компонент
 import { useUnit } from "effector-react";
 import { $user } from "../../Profile";
-import "../styles/StaffPage.css"; // Импортируем стили
+import "../styles/StaffPage.css";
+import StaffBooking from "./StaffBooking";
+
+const { Option } = Select;
 
 const StaffPage = () => {
-    const businessData = localStorage.getItem("currentBusiness");
-    const businessId = businessData ? JSON.parse(businessData).businessId._id : null;
+    const [details, loading] = useStaffDetails();
     const user = useUnit($user);
-    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-    const [details, loading] = useStaffDetails(businessId);
 
-    if (loading && !user) {
+    const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
+    const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
+
+    if (loading) {
         return <Spin />;
     }
 
@@ -25,11 +28,26 @@ const StaffPage = () => {
 
     const { business, services, schedule } = details;
 
-    // Обработчик выбора даты в календаре
+    const startDate = schedule?.startDate ? dayjs(schedule.startDate) : dayjs();
+    const endDate = schedule?.endDate ? dayjs(schedule.endDate) : null;
+
+    const daysOff = schedule?.daysOff || [];
+
     const handleDateSelect = (date: Dayjs) => {
+        if (daysOff.includes(date.format("dddd"))) {
+            message.error("В этот день сотрудник не работает");
+            return;
+        }
         setSelectedDate(date);
         message.info(`Вы выбрали дату: ${date.format("DD.MM.YYYY")}`);
-        // Здесь можно добавить запрос на сервер для получения данных на выбранную дату
+    };
+
+    const handleMonthChange = (month: number) => {
+        setCurrentMonth((prev) => prev.month(month));
+    };
+
+    const handleYearChange = (year: number) => {
+        setCurrentMonth((prev) => prev.year(year));
     };
 
     return (
@@ -38,7 +56,6 @@ const StaffPage = () => {
             <h1 className="business-title">{`Бизнес: ${business.name}`}</h1>
 
             <div className="content-container">
-                {/* Услуги */}
                 <Card title="Услуги" className="services-card">
                     <List
                         dataSource={services}
@@ -53,48 +70,67 @@ const StaffPage = () => {
                     />
                 </Card>
 
-                {/* Календарь */}
                 <Card title="Календарь" className="calendar-card">
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "10px",
+                            marginBottom: "10px",
+                        }}
+                    >
+                        <Select
+                            value={currentMonth.month()}
+                            onChange={handleMonthChange}
+                            style={{ width: 120 }}
+                        >
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <Option key={i} value={i}>
+                                    {dayjs().month(i).format("MMMM")}
+                                </Option>
+                            ))}
+                        </Select>
+
+                        <Select
+                            value={currentMonth.year()}
+                            onChange={handleYearChange}
+                            style={{ width: 100 }}
+                        >
+                            {Array.from({ length: 5 }, (_, i) => {
+                                const year = dayjs().year() - 2 + i;
+                                return (
+                                    <Option key={year} value={year}>
+                                        {year}
+                                    </Option>
+                                );
+                            })}
+                        </Select>
+                    </div>
+
                     <Calendar
                         fullscreen={false}
                         onSelect={handleDateSelect}
-                        value={selectedDate || dayjs()}
-                        disabledDate={(current) => {
-                            // Отключаем даты, которые меньше текущей
-                            return current && current < dayjs().startOf("day");
-                        }}
+                        value={selectedDate}
                     />
                 </Card>
 
-                {/* Расписание */}
-                <Card title="Расписание" className="schedule-card">
-                    <p>{`Тип: ${schedule?.scheduleType}`}</p>
-                    <p>
-                        {`Даты: ${dayjs(schedule?.startDate).format("DD.MM.YYYY")} - ${dayjs(
-                            schedule?.endDate
-                        ).format("DD.MM.YYYY")}`}
-                    </p>
-                    <p>{`Выходные: ${schedule?.daysOff?.join(", ") || "Нет"}`}</p>
-                    <List
-                        dataSource={schedule?.workHours}
-                        renderItem={(hour) => (
-                            <List.Item className="work-hour-item">
-                                <p>{`Рабочие часы: ${hour.startTime} - ${hour.endTime}`}</p>
-                                {hour.breaks.map((br, index) => (
-                                    <p key={index}>
-                                        {`Перерыв: ${br.startBreak} - ${br.endBreak}`}
-                                    </p>
-                                ))}
-                            </List.Item>
-                        )}
+                {/* ✅ Вставляем компонент заработка */}
+                {business._id && user?._id && selectedDate && (
+                    <StaffEarnings
+                        businessId={business._id}
+                        staffId={user._id}
+                        selectedDate={selectedDate}
                     />
-                </Card>
+                )}
+
+                {business._id && user?._id && (
+                    <StaffBooking
+                        businessId={business._id}
+                        staffId={user._id}
+                        selectedDate={selectedDate}
+                        setSelectedDate={setSelectedDate}
+                    />
+                )}
             </div>
-
-            {/* Бронирования */}
-            {businessId && user?._id && (
-                <StaffBookings businessId={businessId} staffId={user._id} />
-            )}
         </div>
     );
 };

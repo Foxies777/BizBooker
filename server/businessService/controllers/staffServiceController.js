@@ -41,7 +41,41 @@ const addServicesToStaff = async (req, res) => {
         res.status(500).send({ message: "Ошибка сервера." });
     }
 };
+const updateServicesForStaff = async (req, res) => {
+    try {
+        const { staffId, serviceIds } = req.body;
 
+        if (!staffId || !Array.isArray(serviceIds)) {
+            return res.status(400).json({ message: "staffId и serviceIds обязательны." });
+        }
+
+        const staff = await User.findById(staffId);
+        if (!staff) {
+            return res.status(404).json({ message: "Сотрудник не найден." });
+        }
+
+        const services = await Service.find({ _id: { $in: serviceIds } });
+        if (services.length !== serviceIds.length) {
+            return res.status(400).json({ message: "Некоторые услуги не найдены." });
+        }
+
+        // Удаляем старые услуги сотрудника
+        await StaffService.deleteMany({ staffId });
+
+        // Добавляем новые услуги
+        const staffServices = serviceIds.map((serviceId) => ({
+            staffId,
+            serviceId,
+        }));
+
+        await StaffService.insertMany(staffServices);
+
+        res.status(200).json({ message: "Услуги успешно обновлены." });
+    } catch (error) {
+        console.error("Ошибка при обновлении услуг сотрудника:", error);
+        res.status(500).json({ message: "Ошибка сервера." });
+    }
+};
 // Получение всех услуг сотрудника
 const getStaffServices = async (req, res) => {
     try {
@@ -58,5 +92,6 @@ const getStaffServices = async (req, res) => {
 
 module.exports = {
     addServicesToStaff,
+    updateServicesForStaff,
     getStaffServices,
 };

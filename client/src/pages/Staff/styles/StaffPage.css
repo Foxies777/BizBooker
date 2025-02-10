@@ -19,7 +19,7 @@
     justify-content: center;
 }
 
-.services-card, .calendar-card, .schedule-card {
+.services-card, .calendar-card, .schedule-card, .earnings-card, .bookings-card {
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -27,7 +27,7 @@
     max-width: 600px;
 }
 
-.services-card .ant-card-body, .calendar-card .ant-card-body, .schedule-card .ant-card-body {
+.services-card .ant-card-body, .calendar-card .ant-card-body, .schedule-card .ant-card-body, .earnings-card .ant-card-body, .bookings-card .ant-card-body {
     padding: 20px;
 }
 
@@ -56,4 +56,88 @@
 .calendar-card .ant-picker-cell-selected .ant-picker-cell-inner {
     background-color: #1890ff;
     color: white;
+}
+
+/* Стили для компонента заработка */
+.earnings-card {
+    margin-top: 20px;
+}
+
+.earnings-card p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Стили для компонента записей */
+.bookings-card {
+    margin-top: 20px;
+}
+
+.bookings-card .ant-list-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.bookings-card .ant-list-item:last-child {
+    border-bottom: none;
+}
+
+.bookings-card .ant-list-item-meta {
+    margin-bottom: 10px;
+}
+
+.bookings-card .ant-list-item-meta-title {
+    font-size: 16px;
+    color: #1890ff;
+}
+
+.bookings-card .ant-list-item-meta-description {
+    font-size: 14px;
+    color: #666;
+}
+
+.bookings-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.bookings-card .ant-btn {
+    margin-right: 10px;
+}
+
+.bookings-card .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+.bookings-card .ant-btn-danger {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    color: white;
+}
+
+.bookings-card .ant-btn-danger:hover {
+    background-color: #ff7875;
+    border-color: #ff7875;
+}
+
+/* Стили для кнопки сброса фильтра */
+.bookings-card .ant-btn-default {
+    margin-top: 10px;
+}
+
+/* Стили для сообщений об отсутствии записей */
+.bookings-card p {
+    text-align: center;
+    color: #666;
+}
+
+/* Стили для спиннера */
+.ant-spin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
 }

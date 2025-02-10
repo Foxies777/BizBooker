@@ -1,12 +1,18 @@
 import React, { useEffect } from "react";
-import { Card, List, Spin } from "antd";
+import { Card, List, Spin, Button } from "antd";
 import { useStaffBookings } from "../hooks/useStaffBookings";
+import dayjs, { Dayjs } from "dayjs";
+import { useUnit } from "effector-react";
+import { updateBookingStatusFx } from "../../../shared/staff";
 
-const StaffBookings: React.FC<{ businessId: string; staffId: string }> = ({
-    businessId,
-    staffId,
-}) => {
+const StaffBookings: React.FC<{
+    businessId: string;
+    staffId: string;
+    selectedDate: Dayjs | null;
+    setSelectedDate: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+}> = ({ businessId, staffId, selectedDate, setSelectedDate }) => {
     const { bookings, loading, fetchBookings } = useStaffBookings();
+    const updateStatus = useUnit(updateBookingStatusFx);
 
     useEffect(() => {
         if (businessId && staffId) {
@@ -18,14 +24,39 @@ const StaffBookings: React.FC<{ businessId: string; staffId: string }> = ({
         return <Spin />;
     }
 
-    if (!bookings.length) {
-        return <p>Записи не найдены.</p>;
+    const filteredBookings = selectedDate
+        ? bookings.filter((booking) => {
+              const bookingDate = dayjs(booking.date, "DD.MM.YYYY"); // Явно указываем формат
+              return (
+                  bookingDate.isValid() &&
+                  bookingDate.isSame(selectedDate, "day")
+              );
+          })
+        : bookings;
+
+    const resetFilteredBookings = () => setSelectedDate(null);
+    const handleClientStatus = async (
+        bookingId: string,
+        status: "completed" | "canceled"
+    ) => {
+        console.log(`Обновление статуса: ${status}, запись ID: ${bookingId}`);
+        await updateStatus({ bookingId, status });
+    };
+    if (!filteredBookings.length) {
+        return (
+            <>
+                <p>Записей на выбранную дату нет.</p>
+                <Button onClick={resetFilteredBookings}>
+                    Показать все записи
+                </Button>
+            </>
+        );
     }
 
     return (
         <Card title="Записи сотрудника">
             <List
-                dataSource={bookings}
+                dataSource={filteredBookings}
                 renderItem={(booking) => (
                     <List.Item>
                         <List.Item.Meta
@@ -37,6 +68,35 @@ const StaffBookings: React.FC<{ businessId: string; staffId: string }> = ({
                         <p>{`Длительность: ${booking.serviceDuration} мин.`}</p>
                         <p>{`Цена: ${booking.servicePrice}₽`}</p>
                         <p>{`Статус: ${booking.status}`}</p>
+
+                        {/* Кнопки обновления статуса */}
+                        {booking.status === "Ожидает" && (
+                            <>
+                                <Button
+                                    type="primary"
+                                    onClick={() =>
+                                        handleClientStatus(
+                                            booking._id,
+                                            "completed"
+                                        )
+                                    }
+                                >
+                                    Клиент пришёл
+                                </Button>
+                                <Button
+                                    type="default"
+                                    danger
+                                    onClick={() =>
+                                        handleClientStatus(
+                                            booking._id,
+                                            "canceled"
+                                        )
+                                    }
+                                >
+                                    Клиент не пришёл
+                                </Button>
+                            </>
+                        )}
                     </List.Item>
                 )}
             />

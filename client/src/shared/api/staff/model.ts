@@ -32,6 +32,7 @@ export type StaffResponse = {
     }[];
 };
 export type StaffBusinessesResponse = {
+    staffId: string;
     businessId: {
         _id: string;
         name: string;
@@ -82,6 +83,7 @@ export type StaffDetailsResponse = {
     schedule: Schedule | null;
 };
 export type Booking = {
+    _id: string;
     serviceName: string;
     serviceDuration: number;
     servicePrice: number;
@@ -90,4 +92,14 @@ export type Booking = {
     endTime: string; 
     clientName: string;
     status: string; 
+};
+
+export type UpdateBookingStatusRequest = {
+    bookingId: string;
+    status: "completed" | "canceled";
+};
+
+export type EarningsResponse = {
+    dailyEarnings: number;
+    monthlyEarnings: number;
 };
