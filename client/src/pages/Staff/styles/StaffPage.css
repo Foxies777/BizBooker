@@ -1,9 +1,10 @@
-/* StaffPage.css */
-
 .staff-page {
     padding: 20px;
     background-color: #f5f5f5;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .business-title {
@@ -17,6 +18,13 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
+    align-items: flex-start;
+}
+
+.services-card, .calendar-card, .earnings-card {
+    flex: 1;
+    min-width: 300px;
+    max-width: 400px;
 }
 
 .services-card, .calendar-card, .schedule-card, .earnings-card, .bookings-card {
@@ -27,51 +35,21 @@
     max-width: 600px;
 }
 
-.services-card .ant-card-body, .calendar-card .ant-card-body, .schedule-card .ant-card-body, .earnings-card .ant-card-body, .bookings-card .ant-card-body {
+.services-card .ant-card-body, 
+.calendar-card .ant-card-body, 
+.schedule-card .ant-card-body, 
+.earnings-card .ant-card-body, 
+.bookings-card .ant-card-body {
     padding: 20px;
 }
 
-.service-item, .work-hour-item {
-    border-bottom: 1px solid #f0f0f0;
-    padding: 10px 0;
-}
-
-.service-item:last-child, .work-hour-item:last-child {
-    border-bottom: none;
-}
-
-.calendar-card .ant-picker-calendar {
-    border: none;
-    background: transparent;
-}
-
-.calendar-card .ant-picker-calendar-header {
-    display: none;
-}
-
-.calendar-card .ant-picker-cell-inner {
-    border-radius: 50%;
-}
-
-.calendar-card .ant-picker-cell-selected .ant-picker-cell-inner {
-    background-color: #1890ff;
-    color: white;
-}
-
-/* Стили для компонента заработка */
 .earnings-card {
-    margin-top: 20px;
+    align-self: flex-start; /* Поднимаем вверх, чтобы не уходила вниз */
 }
 
-.earnings-card p {
-    margin: 10px 0;
-    font-size: 16px;
-    color: #333;
-}
-
-/* Стили для компонента записей */
 .bookings-card {
-    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .bookings-card .ant-list-item {
@@ -82,62 +60,49 @@
 .bookings-card .ant-list-item:last-child {
     border-bottom: none;
 }
-
-.bookings-card .ant-list-item-meta {
-    margin-bottom: 10px;
+.bookings-container {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
 }
 
-.bookings-card .ant-list-item-meta-title {
-    font-size: 16px;
-    color: #1890ff;
-}
 
-.bookings-card .ant-list-item-meta-description {
-    font-size: 14px;
-    color: #666;
-}
-
-.bookings-card p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #333;
-}
-
-.bookings-card .ant-btn {
-    margin-right: 10px;
-}
-
-.bookings-card .ant-btn-primary {
-    background-color: #1890ff;
-    border-color: #1890ff;
-}
-
-.bookings-card .ant-btn-danger {
-    background-color: #ff4d4f;
-    border-color: #ff4d4f;
-    color: white;
-}
-
-.bookings-card .ant-btn-danger:hover {
-    background-color: #ff7875;
-    border-color: #ff7875;
-}
-
-/* Стили для кнопки сброса фильтра */
-.bookings-card .ant-btn-default {
-    margin-top: 10px;
-}
-
-/* Стили для сообщений об отсутствии записей */
-.bookings-card p {
+.no-bookings {
     text-align: center;
     color: #666;
+    font-size: 16px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
 }
 
-/* Стили для спиннера */
 .ant-spin {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100px;
 }
+
+
+/* .bookings-container p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.bookings-container button {
+    background-color: #1890ff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.bookings-container button:hover {
+    background-color: #40a9ff;
+} */

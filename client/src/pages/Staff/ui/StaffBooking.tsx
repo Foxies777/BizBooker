@@ -44,16 +44,17 @@ const StaffBookings: React.FC<{
     };
     if (!filteredBookings.length) {
         return (
-            <>
+            <div className="no-bookings">
                 <p>Записей на выбранную дату нет.</p>
                 <Button onClick={resetFilteredBookings}>
                     Показать все записи
                 </Button>
-            </>
+            </div>
         );
     }
 
     return (
+        <div className="bookings-container">
         <Card title="Записи сотрудника">
             <List
                 dataSource={filteredBookings}
@@ -69,30 +70,12 @@ const StaffBookings: React.FC<{
                         <p>{`Цена: ${booking.servicePrice}₽`}</p>
                         <p>{`Статус: ${booking.status}`}</p>
 
-                        {/* Кнопки обновления статуса */}
                         {booking.status === "Ожидает" && (
                             <>
-                                <Button
-                                    type="primary"
-                                    onClick={() =>
-                                        handleClientStatus(
-                                            booking._id,
-                                            "completed"
-                                        )
-                                    }
-                                >
+                                <Button type="primary" onClick={() => handleClientStatus(booking._id, "completed")}>
                                     Клиент пришёл
                                 </Button>
-                                <Button
-                                    type="default"
-                                    danger
-                                    onClick={() =>
-                                        handleClientStatus(
-                                            booking._id,
-                                            "canceled"
-                                        )
-                                    }
-                                >
+                                <Button type="default" danger onClick={() => handleClientStatus(booking._id, "canceled")}>
                                     Клиент не пришёл
                                 </Button>
                             </>
@@ -101,6 +84,7 @@ const StaffBookings: React.FC<{
                 )}
             />
         </Card>
+    </div>
     );
 };
 

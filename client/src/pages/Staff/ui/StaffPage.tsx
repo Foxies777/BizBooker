@@ -3,7 +3,7 @@ import { useStaffDetails } from "../hooks/useStaffDetails";
 import { Spin, Card, List, Calendar, message, Select } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { Navbar } from "../../Business";
-import StaffEarnings from "./StaffEarnings"; // ✅ Импортируем компонент
+import StaffEarnings from "./StaffEarnings";
 import { useUnit } from "effector-react";
 import { $user } from "../../Profile";
 import "../styles/StaffPage.css";
@@ -28,9 +28,8 @@ const StaffPage = () => {
 
     const { business, services, schedule } = details;
 
-    const startDate = schedule?.startDate ? dayjs(schedule.startDate) : dayjs();
+    const startDate = schedule?.startDate ? dayjs(schedule.startDate) : null;
     const endDate = schedule?.endDate ? dayjs(schedule.endDate) : null;
-
     const daysOff = schedule?.daysOff || [];
 
     const handleDateSelect = (date: Dayjs) => {
@@ -110,15 +109,25 @@ const StaffPage = () => {
                         fullscreen={false}
                         onSelect={handleDateSelect}
                         value={selectedDate}
+                        disabledDate={(current) => {
+                            const formattedDay = current.format("dddd");
+
+                            return (
+                                (startDate &&
+                                    current.isBefore(startDate, "day")) || // Блокируем даты до начала работы
+                                (endDate && current.isAfter(endDate, "day")) || // Блокируем даты после окончания работы
+                                daysOff.includes(formattedDay) // Блокируем выходные
+                            );
+                        }}
                     />
                 </Card>
 
-                {/* ✅ Вставляем компонент заработка */}
-                {business._id && user?._id && selectedDate && (
+                {/* ✅ Компонент заработка */}
+                {business._id && user?._id && (
                     <StaffEarnings
                         businessId={business._id}
                         staffId={user._id}
-                        selectedDate={selectedDate}
+                        selectedDate={selectedDate ?? dayjs()} // Используем текущую дату вместо null
                     />
                 )}
 

@@ -114,15 +114,14 @@ const getAvailableDatesForServiceAndStaff = async (req, res) => {
         }
 
         const schedule = staffSchedules[0].scheduleId;
-        console.log("Schedule: ", schedule);
 
+        
         // Генерация всех дат в диапазоне расписания
         const workDates = generateDatesInRange(schedule.startDate, schedule.endDate, schedule.daysOff);
-        console.log("Work Dates: ", workDates);
+        console.log("Work Dates: ", workDates.slice(2));
 
         // Получаем рабочие часы
         const workHours = await WorkHour.find({ scheduleId: schedule._id }).lean();
-        console.log("Work Hours: ", workHours);
 
         if (!workHours || workHours.length === 0) {
             return res
@@ -135,7 +134,6 @@ const getAvailableDatesForServiceAndStaff = async (req, res) => {
             staffId,
             serviceId,
         }).lean();
-        console.log("Existing Bookings: ", existingBookings);
 
         // Учет перерывов
         const breaks = await Break.find({
@@ -184,7 +182,6 @@ const getAvailableDatesForServiceAndStaff = async (req, res) => {
             };
         });
 
-        console.log("availableDates", availableDates);
         res.status(200).json(availableDates);
     } catch (error) {
         console.error("Ошибка при получении доступных дат:", error);
@@ -197,11 +194,17 @@ const generateDatesInRange = (startDate, endDate, daysOff) => {
     const dates = [];
     const currentDate = new Date(startDate);
 
-    while (currentDate <= new Date(endDate)) {
-        const day = currentDate.toISOString().split("T")[0];
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; // Английские названия дней недели
 
-        if (!daysOff.includes(day)) {
-            dates.push(new Date(currentDate));
+    while (currentDate <= new Date(endDate)) {
+        const day = currentDate.getDay(); // Получаем индекс дня недели (0 - Воскресенье, 1 - Понедельник и т.д.)
+        const formattedDay = dayNames[day]; // Преобразуем индекс в строку дня недели (например, "Monday", "Tuesday")
+
+        if (!daysOff.includes(formattedDay)) { // Проверяем, есть ли день недели в списке выходных
+            console.log("!!!!", formattedDay);
+            console.log("12", daysOff);
+            
+            dates.push(new Date(currentDate)); // Добавляем дату в массив
         }
 
         currentDate.setDate(currentDate.getDate() + 1); // Переход на следующий день
@@ -209,6 +212,8 @@ const generateDatesInRange = (startDate, endDate, daysOff) => {
 
     return dates;
 };
+
+
 
 // Преобразование времени в дату
 const parseTimeToDate = (time, date) => {
