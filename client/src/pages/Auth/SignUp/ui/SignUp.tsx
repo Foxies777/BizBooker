@@ -2,7 +2,7 @@ import { Button, Checkbox, Col, Form, Input, Row } from "antd"
 import { Link, useNavigate } from "react-router-dom"
 import "../index"
 import { useSignUp, signUpFx, BizRoutes } from "../index"
-
+import '../styles/SignUp.css'
 const Registration = () => {
     const [signUp, loading] = useSignUp()
 

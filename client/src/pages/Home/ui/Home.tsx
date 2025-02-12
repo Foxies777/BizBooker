@@ -19,7 +19,8 @@ const BusinessList = ({ businesses, loading }: BusinessListProps) => {
             </div>
         );
     }
-
+    console.log(businesses[0].category.name);
+    
     return (
         <div className="business-list">
             {businesses.map((business, index) => (
@@ -58,26 +59,26 @@ const Home = () => {
         <div className="home-container">
             <Navbar />
             <div className="home-header">
-                <h1>Welcome to BizBooker</h1>
-                <h2>Discover the best businesses in your area</h2>
+                <h1>Добро пожаловать в BizBooker</h1>
+                <h2>Откройте для себя лучшие компании в вашем регионе</h2>
             </div>
             <div className="search-container">
                 <input
                     type="text"
-                    placeholder="Search"
+                    placeholder="Поиск"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button type="button">Search</button>
+                <button type="button">Поиск</button>
             </div>
             <div className="filter-container">
-                <label htmlFor="category-filter">Filter by Category:</label>
+                <label htmlFor="category-filter">Фильтровать по категориям:</label>
                 <select
                     id="category-filter"
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
                 >
-                    <option value="">All Categories</option>
+                    <option value="">Все категории</option>
                     {categories.map((category) => (
                         <option key={category._id} value={category._id}>
                             {category.name}

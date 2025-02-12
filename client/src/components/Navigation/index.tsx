@@ -22,7 +22,7 @@ const Navbar = () => {
       <Layout>
         <Layout.Header className="nav-header">
           <div className="logo">
-            <h3 className="brand-font">Brand Here</h3>
+            <h3 className="brand-font">BizBooker</h3>
           </div>
           <div className="navbar-menu">
             <div className="leftMenu">
