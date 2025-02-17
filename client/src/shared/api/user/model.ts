@@ -25,6 +25,7 @@ export type User = {
     role: "client" | "staff" | "business" | "admin"
 }
 export type Booking = {
+    _id: string;
     businessName: string;
     serviceName: string;
     serviceDuration: number;

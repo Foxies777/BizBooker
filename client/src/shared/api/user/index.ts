@@ -32,3 +32,16 @@ export const getUserBookings = async (userId: string) => {
         throw new Error("Не удалось загрузить записи.");
     }
 };
+
+export const cancelUserBooking = async (userId: string, bookingId: string) => {
+    try {
+        const response = await api
+            .put(`users/${userId}/bookings/${bookingId}/cancel`)
+            .json<{ message: string }>();
+
+        return response;
+    } catch (error) {
+        console.error("Ошибка при отмене записи:", error);
+        throw new Error("Не удалось отменить запись.");
+    }
+};

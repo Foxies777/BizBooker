@@ -1,97 +1,93 @@
-const User = require("../models/user")
-const Booking = require("../models/Booking")
-const Service = require("../models/Service")
-const Business = require("../models/Business")
-const { getBusinessById } = require("../services/businessService")
-
-
-
+const User = require("../models/user");
+const Booking = require("../models/Booking");
+const Service = require("../models/Service");
+const Business = require("../models/Business");
+const { getBusinessById } = require("../services/businessService");
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find()
-        
-        res.status(200).json(users)
+        const users = await User.find();
+
+        res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch users" })
+        res.status(500).json({ error: "Failed to fetch users" });
     }
-}
+};
 
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id)
+        const user = await User.findById(req.params.id);
         if (user) {
-            res.status(200).json(user)
+            res.status(200).json(user);
         } else {
-            res.status(404).json({ error: "User not found" })
+            res.status(404).json({ error: "User not found" });
         }
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch user" })
+        res.status(500).json({ error: "Failed to fetch user" });
     }
-}
+};
 
 const createUser = async (req, res) => {
     try {
-        const user = new User(req.body)
-        await user.save()
-        res.status(201).json(user)
+        const user = new User(req.body);
+        await user.save();
+        res.status(201).json(user);
     } catch (error) {
-        res.status(500).json({ error: "Failed to create user" })
+        res.status(500).json({ error: "Failed to create user" });
     }
-}
+};
 
 const updateUser = async (req, res) => {
     console.log(req);
-    
+
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
-        })
+        });
         if (user) {
-            res.status(200).json(user)
+            res.status(200).json(user);
         } else {
-            res.status(404).json({ error: "User not found" })
+            res.status(404).json({ error: "User not found" });
         }
     } catch (error) {
-        res.status(500).json({ error: "Failed to update user" })
+        res.status(500).json({ error: "Failed to update user" });
     }
-}
+};
 
 const deleteUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
+        const user = await User.findByIdAndDelete(req.params.id);
         if (user) {
-            res.status(204).send()
+            res.status(204).send();
         } else {
-            res.status(404).json({ error: "User not found" })
+            res.status(404).json({ error: "User not found" });
         }
     } catch (error) {
-        res.status(500).json({ error: "Failed to delete user" })
+        res.status(500).json({ error: "Failed to delete user" });
     }
-}
+};
 
 const getUserBusinesses = async (req, res) => {
     try {
+        const { id } = req.params;
 
-        const { id } = req.params
-
-        const user = await User.findById(id)
+        const user = await User.findById(id);
         if (!user) {
-            return res.status(404).json({ message: "User not found" })
+            return res.status(404).json({ message: "User not found" });
         }
 
         const businessPromises = user.businessId.map(async (businessId) => {
-            return await getBusinessById(businessId)
-        })
+            return await getBusinessById(businessId);
+        });
 
-        const businesses = await Promise.all(businessPromises)
+        const businesses = await Promise.all(businessPromises);
 
-        res.status(200).json(businesses)
+        res.status(200).json(businesses);
     } catch (error) {
-        console.error(`Error in getUserBusinesses: ${error}`)
-        res.status(500).json({ message: "Failed to get user businesses" })
+        console.error(`Error in getUserBusinesses: ${error}`);
+        res.status(500).json({ message: "Failed to get user businesses" });
     }
-}
+};
 const getUserBookings = async (req, res) => {
     const { userId } = req.params;
 
@@ -111,6 +107,7 @@ const getUserBookings = async (req, res) => {
 
         // Форматируем данные перед отправкой
         const formattedBookings = userBookings.map((booking) => ({
+            bookingId: booking._id,
             businessName: booking.businessId.name,
             serviceName: booking.serviceId.name,
             serviceDuration: booking.serviceId.duration,
@@ -131,7 +128,9 @@ const getUserBookings = async (req, res) => {
         res.status(200).json(formattedBookings);
     } catch (error) {
         console.error("Ошибка при получении записей пользователя:", error);
-        res.status(500).json({ message: "Не удалось получить записи пользователя." });
+        res.status(500).json({
+            message: "Не удалось получить записи пользователя.",
+        });
     }
 };
 
@@ -145,6 +144,40 @@ const translateStatus = (status) => {
     };
     return statusMap[status] || "Неизвестный статус";
 };
+
+const cancelBooking = async (req, res) => {
+    try {
+        const { userId, bookingId } = req.params;
+
+        // Ищем запись
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ message: "Запись не найдена." });
+        }
+
+        // Проверяем, принадлежит ли запись пользователю
+        if (booking.userId.toString() !== userId) {
+            return res.status(403).json({ message: "Доступ запрещен." });
+        }
+
+        // Проверяем, не завершена ли запись
+        if (booking.status === "completed") {
+            return res
+                .status(400)
+                .json({ message: "Нельзя отменить завершенную запись." });
+        }
+
+        // Обновляем статус на "canceled"
+        booking.status = "canceled";
+        await booking.save();
+
+        res.status(200).json({ message: "Запись успешно отменена.", booking });
+    } catch (error) {
+        console.error("Ошибка при отмене записи:", error);
+        res.status(500).json({ message: "Не удалось отменить запись." });
+    }
+};
+
 module.exports = {
     getUserBusinesses,
     getUsers,
@@ -153,4 +186,5 @@ module.exports = {
     updateUser,
     deleteUser,
     getUserBookings,
-}
+    cancelBooking, 
+};

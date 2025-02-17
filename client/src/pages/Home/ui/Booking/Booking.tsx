@@ -9,8 +9,11 @@ import { useUnit } from "effector-react";
 import { $user } from "../../../Profile";
 import "../../styles/Booking.css"; // Импортируем стили
 import { modalClosed } from "../../../../shared/booking";
+import { $isAuth } from "../../../../shared/auth";
 
 const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
+    const [user, isAuth] = useUnit([$user, $isAuth]);
+
     const [isModalOpen, setModalOpen] = useState(false);
     const [step, setStep] = useState(0);
     const [selectedService, setSelectedService] = useState<string | null>(null);
@@ -23,8 +26,6 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
-
-    const user = useUnit($user);
     const { services, fetchServices, loading: servicesLoading } = useServices();
     const {
         specialists,
@@ -37,16 +38,14 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
         loading: datesLoading,
     } = useAvailableDates();
     const [bookingStatus, createBooking] = useCreateBooking();
-
+    if (!isAuth) {
+        return <div>Вы не авторизованы</div>;
+    }
     const openModal = async () => {
         setModalOpen(true);
         setStep(0);
         await fetchServices(businessId);
     };
-
-    if (!user) {
-        return <div>Вы не авторизованы</div>;
-    }
 
     const closeModal = () => {
         setModalOpen(false);
@@ -60,7 +59,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
         setSelectedSpecialist(null);
         setSelectedDate(null);
         setSelectedTime(null);
-        modalClosed()
+        modalClosed();
         setCurrentMonth(dayjs());
     };
 
@@ -131,7 +130,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
                 .toISOString();
 
             await createBooking({
-                userId: user._id,
+                userId: user?._id || "",
                 businessId,
                 serviceId: selectedService,
                 staffId: selectedSpecialist,
@@ -158,7 +157,7 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
             setStep(step - 1);
         }
     };
-    
+
     const renderStep = () => {
         switch (step) {
             case 0:
@@ -167,19 +166,25 @@ const Booking: React.FC<{ businessId: string }> = ({ businessId }) => {
                 ) : (
                     <div className="booking-step">
                         <h3>Выберите услугу</h3>
-                        {services.length > 0 ? services.map((service) => (
-                            <div
-                                key={service._id}
-                                className={`service-card ${
-                                    selectedService === service._id
-                                        ? "selected"
-                                        : ""
-                                }`}
-                                onClick={() => handleServiceSelect(service._id)}
-                            >
-                                {service.name}
-                            </div>
-                        )): <p>На данный момент нету услуг, зайдите позже</p>}
+                        {services.length > 0 ? (
+                            services.map((service) => (
+                                <div
+                                    key={service._id}
+                                    className={`service-card ${
+                                        selectedService === service._id
+                                            ? "selected"
+                                            : ""
+                                    }`}
+                                    onClick={() =>
+                                        handleServiceSelect(service._id)
+                                    }
+                                >
+                                    {service.name}
+                                </div>
+                            ))
+                        ) : (
+                            <p>На данный момент нету услуг, зайдите позже</p>
+                        )}
                     </div>
                 );
 

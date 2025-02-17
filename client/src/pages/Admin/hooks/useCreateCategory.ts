@@ -7,14 +7,14 @@ import { CreateCategoryRequest } from "../../../shared/api/business/model";
 export const useCreateCategory = () => {
     const [loading, setLoading] = useState(false);
     const createCategory = useUnit(addCategory);
-    const resetFormEvent = useUnit(resetForm); // Получаем событие resetForm
+    const resetFormEvent = useUnit(resetForm);
 
     const handleCreateCategory = (category: CreateCategoryRequest) => {
         setLoading(true);
         try {
             console.log("try handleCreateCategory:", category);
-            createCategory(category); // Ждем завершения
-            resetFormEvent(); // Вызываем resetForm после успешного создания
+            createCategory(category);
+            resetFormEvent(); 
         } catch (error) {
             console.error("Failed to create category:", error);
         } finally {

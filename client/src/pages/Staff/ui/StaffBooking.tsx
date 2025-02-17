@@ -26,7 +26,7 @@ const StaffBookings: React.FC<{
 
     const filteredBookings = selectedDate
         ? bookings.filter((booking) => {
-              const bookingDate = dayjs(booking.date, "DD.MM.YYYY"); // Явно указываем формат
+              const bookingDate = dayjs(booking.date, "DD.MM.YYYY"); 
               return (
                   bookingDate.isValid() &&
                   bookingDate.isSame(selectedDate, "day")

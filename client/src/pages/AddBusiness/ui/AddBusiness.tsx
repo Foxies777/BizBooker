@@ -3,6 +3,7 @@ import { useCreateBusiness } from "../hooks/useCreateBusiness"
 import { CreateBusinessRequest } from "../../../shared/api/business/model"
 import { useGetCategory } from "../hooks/useGetCategory"
 import { Navigate, useNavigate } from "react-router-dom"
+import { Navbar } from "../../Business"
 
 
 const AddBusinessForm = () => {
@@ -17,6 +18,8 @@ const AddBusinessForm = () => {
     }
 
     return (
+        <>
+        <Navbar/>
         <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
             name="name"
@@ -72,6 +75,7 @@ const AddBusinessForm = () => {
             </Button>
         </Form.Item>
     </Form>
+    </>
     )
 }
 

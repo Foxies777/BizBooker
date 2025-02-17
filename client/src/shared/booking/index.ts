@@ -40,7 +40,7 @@ export const modalClosed = createEvent();
 // Stores
 export const $services = restore<Service[]>(fetchServicesFx.doneData, []).reset(modalClosed);
 export const $specialists = restore<Specialist[]>(fetchSpecialistsFx.doneData, [])
-    .reset(modalClosed); 
+    .reset(modalClosed);
 
 export const $availableDates = restore<{ date: string; times: string[] }[]>(
     fetchAvailableDatesFx.doneData,

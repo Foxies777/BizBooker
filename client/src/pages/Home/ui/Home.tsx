@@ -19,8 +19,6 @@ const BusinessList = ({ businesses, loading }: BusinessListProps) => {
             </div>
         );
     }
-    console.log(businesses[0].category.name);
-    
     return (
         <div className="business-list">
             {businesses.map((business, index) => (

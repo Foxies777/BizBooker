@@ -2,7 +2,7 @@
 
 
 //hooks
-export {useBusinesses} from './hooks/useBusinesses'
+export {useBusinesses} from './hooks/useCreateCategory'
 
 //types
 export * from './types/model'

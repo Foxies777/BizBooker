@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Button, Form, Input } from "antd";
-import { useCreateCategory } from "../hooks/useBusinesses"; // Импортируем resetForm
+import { useCreateCategory } from "../hooks/useCreateCategory";
 import { CreateCategoryRequest } from "../../../shared/api/business/model";
 import { resetForm } from "../../../shared/business";
 
@@ -26,7 +26,7 @@ const AddCategorysForm = () => {
         <Form form={form} layout="vertical" onFinish={onFinish}>
             <Form.Item
                 name="name"
-                label="Business Name"
+                label="Добавить категорию"
                 rules={[{ required: true, message: "Добавьте категорию" }]}
             >
                 <Input placeholder="Добавить категорию" />

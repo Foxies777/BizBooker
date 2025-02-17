@@ -25,19 +25,18 @@ import {
 } from "../api/staff/model";
 import { showErrorMessageFx, showSuccessMessageFx } from "../notification";
 import { $currentBusiness } from "../business";
+import { tokenExprired } from "../auth";
 export const fetchBusinessStaffFx = createEffect(async (businessId: string) => {
     return await getBusinessStaff(businessId);
 });
 
-export const $pendingStaff = createStore<StaffResponse["pendingStaff"]>([]).on(
-    fetchBusinessStaffFx.doneData,
-    (_, data) => data.pendingStaff
-);
+export const $pendingStaff = createStore<StaffResponse["pendingStaff"]>([])
+    .on(fetchBusinessStaffFx.doneData, (_, data) => data.pendingStaff)
+    .reset(tokenExprired);
 
-export const $activeStaff = createStore<StaffResponse["activeStaff"]>([]).on(
-    fetchBusinessStaffFx.doneData,
-    (_, data) => data.activeStaff
-);
+export const $activeStaff = createStore<StaffResponse["activeStaff"]>([])
+    .on(fetchBusinessStaffFx.doneData, (_, data) => data.activeStaff)
+    .reset(tokenExprired);
 
 export const addServicesToStaffFx = createEffect(
     async ({
@@ -61,14 +60,14 @@ export const fetchStaffBusinessFx = createEffect<
 export const $staffBusinesses = restore<StaffBusinessesResponse[]>(
     fetchStaffBusinessFx.doneData,
     []
-);
+).reset(tokenExprired);
 
 export const fetchStaffDetailsFx = createEffect<
     { businessId: string; staffId: string },
     StaffDetailsResponse
 >(({ businessId, staffId }) => getStaffDetailsByBusiness(businessId, staffId));
 
-export const $staffDetails = createStore<StaffDetailsResponse | null>(null);
+export const $staffDetails = createStore<StaffDetailsResponse | null>(null)    .reset(tokenExprired)
 
 export const fetchStaffBookingsFx = createEffect<
     { businessId: string; staffId: string },
@@ -112,13 +111,24 @@ export const updateServicesForStaffFx = createEffect(
     }
 );
 export const fetchStaffEarningsFx = createEffect(
-    async ({ businessId, staffId, date }: { businessId: string; staffId: string; date: string }) => {
+    async ({
+        businessId,
+        staffId,
+        date,
+    }: {
+        businessId: string;
+        staffId: string;
+        date: string;
+    }) => {
         return await getStaffEarnings(businessId, staffId, date);
     }
 );
 
 // Хранилище данных о заработке
-export const $staffEarnings = restore<EarningsResponse | null>(fetchStaffEarningsFx.doneData, null);
+export const $staffEarnings = restore<EarningsResponse | null>(
+    fetchStaffEarningsFx.doneData,
+    null
+)    .reset(tokenExprired)
 
 // Обработка ошибок
 sample({
