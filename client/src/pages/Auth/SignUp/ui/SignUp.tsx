@@ -1,16 +1,11 @@
-import { Button, Checkbox, Col, Form, Input, Row } from "antd"
-import { Link, useNavigate } from "react-router-dom"
-import "../index"
-import { useSignUp, signUpFx, BizRoutes } from "../index"
-import '../styles/SignUp.css'
+import { Button,  Col, Form, Input, Row } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import "../index";
+import { useSignUp, signUpFx, BizRoutes } from "../index";
+import InputMask from "react-input-mask";
+import "../styles/SignUp.css";
 const Registration = () => {
-    const [signUp, loading] = useSignUp()
-
-    const navigate = useNavigate()
-
-    signUpFx.done.watch(() => {
-        // navigate(ERoutes.PROFILE)
-    })
+    const [signUp, loading] = useSignUp();
     return (
         <Col className="styles">
             <Row justify={"center"}>
@@ -86,11 +81,24 @@ const Registration = () => {
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please input your username!",
+                                    message: "Пожалуйста, введите ваш телефон!",
+                                },
+                                {
+                                    pattern:
+                                        /^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/,
+                                    message:
+                                        "Телефон должен быть в формате +7 (___) ___-__-__",
                                 },
                             ]}
+                            normalize={(value) => value.slice(0, 18)} // Обрезает строку, если ввели лишние символы
                         >
-                            <Input />
+                            <InputMask
+                                mask="+7 (999) 999-99-99"
+                                maskChar={null} // Убираем символы-заполнители
+                                alwaysShowMask
+                            >
+                                {(inputProps) => <Input {...inputProps} />}
+                            </InputMask>
                         </Form.Item>
 
                         <Form.Item
@@ -126,7 +134,7 @@ const Registration = () => {
                 </div>
             </Row>
         </Col>
-    )
-}
+    );
+};
 
-export default Registration
+export default Registration;
